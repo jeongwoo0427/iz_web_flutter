@@ -64,6 +64,7 @@ flutter:
   assets:
     - asset/image/banner/
     - asset/image/badge/
+    - asset/json/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
