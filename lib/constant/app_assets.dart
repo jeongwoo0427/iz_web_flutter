@@ -19,7 +19,6 @@ class AppAssets{
   //
   // static final String splash_background = 'asset/image/background/night_forest.jpg';
 
-  static final String test_banner = 'asset/image/banner/tile017.png';
   static final String test_badge = 'asset/image/badge/tile041.png';
 
   static const String bannerPath = 'asset/image/banner/';

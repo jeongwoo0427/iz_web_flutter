@@ -1,8 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:iz_web_flutter/constant/app_assets.dart';
+import 'package:iz_web_flutter/constant/app_constants.dart';
 import 'package:iz_web_flutter/core/implement/future_status.dart';
+import 'package:iz_web_flutter/widget/button/AlignedMaterialButton.dart';
 import 'package:iz_web_flutter/widget/error_action_widget.dart';
+import 'package:iz_web_flutter/widget/scaffold/constrained_layout.dart';
 
 import '../../core/model/splatbannermaker/banner_model.dart';
 
@@ -13,7 +17,7 @@ class BannerSelectScreen extends StatefulWidget {
   State<BannerSelectScreen> createState() => _BannerSelectScreenState();
 }
 
-class _BannerSelectScreenState extends State<BannerSelectScreen> implements FutureStatus {
+class _BannerSelectScreenState extends State<BannerSelectScreen> {
   late Future<List<BannerModel>> bannersFuture;
 
   @override
@@ -37,7 +41,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> implements Futu
             return buildError();
           }
           if (snapshot.hasData) {
-            return buildSuccess();
+            return buildSuccess(snapshot.data!);
           }
           return buildNoData();
         },
@@ -80,27 +84,48 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> implements Futu
   }
 
   @override
-  Widget buildSuccess() {
-    return Container();
+  Widget buildSuccess(List<BannerModel> banners) {
+    return ConstrainedLayout(
+      child: ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15, vertical: 20),
+        itemCount: banners.length,
+        separatorBuilder: (context, _) {
+          return SizedBox(
+            height: 15,
+          );
+        },
+        itemBuilder: (context, index) {
+          return AlignedMaterialButton(
+            child: Image.asset(AppAssets.bannerPath + banners[index].fileName,width: 600,),
+            onTap: () {
+              _onTapBannerItem(banners[index]);
+            },
+          );
+        },
+      ),
+    );
   }
 
   Future<List<BannerModel>> fetch() async {
-    try{
-      await Future.delayed(Duration(milliseconds: 1000));
+    try {
+      await Future.delayed(Duration(milliseconds: 300));
       String rawJson = await DefaultAssetBundle.of(context).loadString("asset/json/banners.json");
 
       Map bannerMap = jsonDecode(rawJson);
 
       List<BannerModel> banners = [];
-      for(int i =0; i<bannerMap['banners'].length; i++){
+      for (int i = 0; i < bannerMap['banners'].length; i++) {
         banners.add(BannerModel.fromMap(bannerMap['banners'][i]));
       }
 
       return banners;
-    }catch(err){
+    } catch (err) {
       print(err.toString());
       throw err;
     }
+  }
 
+  void _onTapBannerItem(BannerModel item) {
+    Navigator.pop(context, item);
   }
 }

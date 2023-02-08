@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:iz_web_flutter/core/model/splatbannermaker/banner_model.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'dart:ui' as ui;
 
@@ -24,6 +25,15 @@ class ReceiptPage extends StatefulWidget {
 class _ReceiptPageState extends State<ReceiptPage> {
   final GlobalKey genKey = GlobalKey();
 
+  late BannerModel _selectedBanner;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _selectedBanner = BannerModel(name: 'name', fileName: 'tile013.png', rareLevel: 'rareLevel');
+  }
+
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -38,9 +48,73 @@ class _ReceiptPageState extends State<ReceiptPage> {
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15),
           children: [
-            _BannerSector(onTapBanner: _onTapBanner,),
-            _BadgeSector(),
-            _ResultSector(genKey: genKey),
+            SizedBox(
+              height: 50,
+            ),
+            Text(
+              '1. 마음에 드는 배경을 골라주세요.',
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            AlignedMaterialButton(
+                onTap: _onTapBanner,
+                child: Image.asset(AppAssets.bannerPath + _selectedBanner.fileName,
+                    width: ResponsiveValue<double>(context,
+                        defaultValue: 600, valueWhen: [const Condition.smallerThan(name: TABLET, value: 400)]).value)),
+            SizedBox(
+              height: 100,
+            ),
+            Text(
+              '2. 배찌를 선택해 주세요',
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                AlignedMaterialButton(
+                  child: Image.asset(AppAssets.test_badge,
+                      width: ResponsiveValue<double>(context,
+                          defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
+                ),
+                AlignedMaterialButton(
+                  child: Image.asset(AppAssets.test_badge,
+                      width: ResponsiveValue<double>(context,
+                          defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
+                ),
+                AlignedMaterialButton(
+                  child: Image.asset(AppAssets.test_badge,
+                      width: ResponsiveValue<double>(context,
+                          defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 100,
+            ),
+            Text(
+              '3. 결과를 확인해주세요',
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            AlignedMaterialButton(
+              child: RepaintBoundary(
+                  key: genKey,
+                  child: Container(
+                    child: Image.asset(
+                      AppAssets.bannerPath + _selectedBanner.fileName,
+                      width: 400,
+                    ),
+                    color: Colors.red,
+                  )),
+            ),
+            SizedBox(
+              height: 100,
+            ),
             RoundedElevatedButton(onPressed: _onPressedSave, child: Text('Save')),
             SizedBox(
               height: 100,
@@ -52,7 +126,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   Future<void> _onPressedSave() async {
-    try{
+    try {
       final RenderRepaintBoundary boundary = genKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage();
 
@@ -63,133 +137,21 @@ class _ReceiptPageState extends State<ReceiptPage> {
       final anchor = AnchorElement(href: "data:application/octet-stream;charset=utf-16le;base64,$content")
         ..setAttribute("download", "splatbanner.png")
         ..click();
-    }catch(ex){
-
-      //TODO: 오류처리하기
-    }
-
-  }
-
-  Future<void> _onTapBanner() async{
-    try{
-      final bannerIndexResult = Navigator.pushNamed(context, RouteNames.banner_select_screen);
-    }catch(ex){
+    } catch (ex) {
       //TODO: 오류처리하기
     }
   }
-}
 
-class _BannerSector extends StatelessWidget {
+  Future<void> _onTapBanner() async {
+    try {
+      final bannerResult = await Navigator.pushNamed(context, RouteNames.banner_select_screen);
+      if (bannerResult == null) return;
 
-  final  onTapBanner;
-
-  const _BannerSector({Key? key,required this.onTapBanner}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-      SizedBox(
-        height: 50,
-      ),
-      Text(
-        '1. 마음에 드는 배경을 골라주세요.',
-      ),
-      SizedBox(
-        height: 30,
-      ),
-      AlignedMaterialButton(
-          onTap: onTapBanner,
-          child: Image.asset(AppAssets.test_banner,
-              width: ResponsiveValue<double>(context,
-                  defaultValue: 600, valueWhen: [const Condition.smallerThan(name: TABLET, value: 400)]).value)),
-      SizedBox(
-        height: 100,
-      ),
-    ],);
+      setState(() {
+        _selectedBanner = bannerResult as BannerModel;
+      });
+    } catch (ex) {
+      //TODO: 오류처리하기
+    }
   }
 }
-
-
-class _BadgeSector extends StatelessWidget {
-  const _BadgeSector({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '2. 배찌를 선택해 주세요',
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            AlignedMaterialButton(
-              child: Image.asset(AppAssets.test_badge,
-                  width: ResponsiveValue<double>(context,
-                      defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
-            ),
-            AlignedMaterialButton(
-              child: Image.asset(AppAssets.test_badge,
-                  width: ResponsiveValue<double>(context,
-                      defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
-            ),
-            AlignedMaterialButton(
-              child: Image.asset(AppAssets.test_badge,
-                  width: ResponsiveValue<double>(context,
-                      defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 100,
-        ),
-      ],);
-  }
-}
-
-class _ResultSector extends StatelessWidget {
-  final GlobalKey genKey;
-
-  const _ResultSector({Key? key,required this.genKey}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '3. 결과를 확인해주세요',
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        AlignedMaterialButton(
-          child: RepaintBoundary(
-              key: genKey,
-              child: Container(
-                child: Image.asset(
-                  AppAssets.test_banner,
-                  width: 400,
-                ),
-                color: Colors.red,
-              )),
-        ),
-        SizedBox(
-          height: 100,
-        ),
-      ],);
-  }
-}
-
-
-
-
-
-
