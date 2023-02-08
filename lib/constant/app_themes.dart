@@ -39,7 +39,7 @@ class AppThemes {
   //the light theme
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
-    fontFamily: AppFontFamily.nanum_square_round,
+    fontFamily: AppFontFamily.cookie_run,
     scaffoldBackgroundColor: _lightBackgroundColor,
     appBarTheme: AppBarTheme().copyWith(backgroundColor: _lightBackgroundColor, foregroundColor: _lightFontColor),
     iconTheme: IconThemeData(color: _lightFontColor),
@@ -71,7 +71,7 @@ class AppThemes {
   //the dark theme
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    fontFamily: AppFontFamily.nanum_square_round,
+    fontFamily: AppFontFamily.cookie_run,
     appBarTheme: AppBarTheme().copyWith(backgroundColor: _darkBackgroundColor, foregroundColor: _darkFontColor),
     scaffoldBackgroundColor: _darkBackgroundColor,
     iconTheme: IconThemeData(color: _darkFontColor),

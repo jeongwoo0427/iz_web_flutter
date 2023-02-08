@@ -55,6 +55,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         style: TextStyle(
           color: colorScheme.onBackground,
           fontWeight: FontWeight.w800,
+          fontFamily: AppFontFamily.cookie_run,
           fontSize:
               ResponsiveValue<double>(context, defaultValue: 24, valueWhen: [const Condition.smallerThan(name: TABLET, value: 18)]).value,
         ),
@@ -124,9 +125,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: RoundedTextFieldWidget(
                       hint: 'ex) 이즈빌런',
                       controller: _nicknameController,
-                      onChanged: (text){
-                        setState(() {
-                        });
+                      onChanged: (text) {
+                        setState(() {});
                       },
                     )),
                 Expanded(flex: 3, child: SizedBox())
@@ -148,9 +148,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: RoundedTextFieldWidget(
                       hint: 'ex) #3306',
                       controller: _tagController,
-                      onChanged: (text){
-                          setState(() {
-                          });
+                      onChanged: (text) {
+                        setState(() {});
                       },
                     )),
                 Expanded(flex: 3, child: SizedBox())
@@ -172,9 +171,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: RoundedTextFieldWidget(
                       hint: 'ex) 에어리어에 푹 빠진',
                       controller: _mottoController,
-                      onChanged: (text){
-                        setState(() {
-                        });
+                      onChanged: (text) {
+                        setState(() {});
                       },
                     )),
                 Expanded(flex: 3, child: SizedBox())
@@ -240,7 +238,27 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     ],
                   ),
                 ),
-                Positioned.fill(child: Center(child: Text(_nicknameController.text,style: TextStyle(fontSize: 26,fontWeight: FontWeight.w600,color: Colors.black,fontFamily: AppFontFamily.cookie_run),),))
+                Positioned.fill(
+                    child: Center(
+                  child: Text(
+                    _nicknameController.text,
+                    style: TextStyle(fontSize: 34, fontWeight: FontWeight.w300, color: Colors.black, fontFamily: AppFontFamily.splatoon2_k),
+                  ),
+                )),
+                Positioned(
+                  top: 5,
+                    left: 8,
+                    child: Text(
+                      _mottoController.text,
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black, fontFamily: AppFontFamily.cookie_run),
+                    )),
+                Positioned(
+                    bottom: 5,
+                    left: 13,
+                    child: Text(
+                      _tagController.text,
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: Colors.black, fontFamily: AppFontFamily.cookie_run),
+                    ))
               ],
             ),
             color: Colors.red,

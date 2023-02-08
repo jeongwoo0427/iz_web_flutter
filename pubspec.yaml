@@ -77,3 +77,14 @@ flutter:
           weight: 600
         - asset: asset/font/cookie_run/CookieRun Black.ttf
           weight: 900
+
+    - family: splat2k
+      fonts:
+        - asset: asset/font/splat2k/splat2k.ttf
+          weight: 300
+
+    - family: splatoon2_k
+      fonts:
+        - asset: asset/font/splatoon2_k/splatoon2_k.ttf
+          weight: 300
+
