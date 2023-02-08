@@ -316,7 +316,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     ))
               ],
             ),
-            color: Colors.red,
+            color: Colors.transparent
           )),
     );
   }
