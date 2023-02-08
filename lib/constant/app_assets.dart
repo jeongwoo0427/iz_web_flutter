@@ -22,6 +22,7 @@ class AppAssets{
   static final String test_badge = 'asset/image/badge/tile041.png';
 
   static const String bannerPath = 'asset/image/banner/';
+  static const String badgePath = 'asset/image/badge/';
 
 
 

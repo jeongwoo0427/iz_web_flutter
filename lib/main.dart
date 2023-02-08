@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iz_web_flutter/screen/splatbannermaker/badge_select_screen.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'constant/app_themes.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         routes: {
           RouteNames.splatbannermaker_screen: (context) => SplatBannerMakerScreen(),
           RouteNames.banner_select_screen : (context) => BannerSelectScreen(),
+          RouteNames.badge_select_screen : (context) => BadgeSelectScreen()
         },
         //home: SplatBannerMakerScreen()
     );

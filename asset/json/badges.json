@@ -1,6 +1,12 @@
 {
   "version": 1,
-  "banners": [
+  "badges": [
+    {
+      "no": 0,
+      "name": "",
+      "fileName": "tile000.png",
+      "rareLevel": ""
+    },
     {
       "no": 1,
       "name": "",
@@ -95,6 +101,24 @@
       "no": 16,
       "name": "",
       "fileName": "tile016.png",
+      "rareLevel": ""
+    },
+    {
+      "no": 17,
+      "name": "",
+      "fileName": "tile017.png",
+      "rareLevel": ""
+    },
+    {
+      "no": 18,
+      "name": "",
+      "fileName": "tile018.png",
+      "rareLevel": ""
+    },
+    {
+      "no": 19,
+      "name": "",
+      "fileName": "tile019.png",
       "rareLevel": ""
     }
   ]

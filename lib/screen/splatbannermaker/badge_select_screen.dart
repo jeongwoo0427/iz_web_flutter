@@ -8,31 +8,31 @@ import 'package:iz_web_flutter/widget/button/AlignedMaterialButton.dart';
 import 'package:iz_web_flutter/widget/error_action_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/constrained_layout.dart';
 
-import '../../core/model/splatbannermaker/banner_model.dart';
+import '../../core/model/splatbannermaker/badge_model.dart';
 
-class BannerSelectScreen extends StatefulWidget {
-  BannerSelectScreen({Key? key}) : super(key: key);
+class BadgeSelectScreen extends StatefulWidget {
+  BadgeSelectScreen({Key? key}) : super(key: key);
 
   @override
-  State<BannerSelectScreen> createState() => _BannerSelectScreenState();
+  State<BadgeSelectScreen> createState() => _BadgeSelectScreenState();
 }
 
-class _BannerSelectScreenState extends State<BannerSelectScreen> {
-  late Future<List<BannerModel>> bannersFuture;
+class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
+  late Future<List<BadgeModel>> badgesFuture;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    bannersFuture = fetch();
+    badgesFuture = fetch();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: FutureBuilder<List<BannerModel>>(
-        future: bannersFuture,
+      body: FutureBuilder<List<BadgeModel>>(
+        future: badgesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return buildLoader();
@@ -62,7 +62,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
       child: ErrorActionWidget(
         onRetry: () {
           setState(() {
-            bannersFuture = fetch();
+            badgesFuture = fetch();
           });
         },
       ),
@@ -76,7 +76,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
         message: '데이터가 없습니다.',
         onRetry: () {
           setState(() {
-            bannersFuture = fetch();
+            badgesFuture = fetch();
           });
         },
       ),
@@ -84,49 +84,44 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
   }
 
   @override
-  Widget buildSuccess(List<BannerModel> banners) {
+  Widget buildSuccess(List<BadgeModel> badges) {
     return ConstrainedLayout(
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15, vertical: 20),
-        itemCount: banners.length,
-        separatorBuilder: (context, _) {
-          return SizedBox(
-            height: 15,
-          );
-        },
-        itemBuilder: (context, index) {
-          return AlignedMaterialButton(
-            child: Image.asset(AppAssets.bannerPath + banners[index].fileName,width: 600,),
-            onTap: () {
-              _onTapBannerItem(banners[index]);
-            },
-          );
-        },
-      ),
-    );
+        child: GridView.builder(
+          padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding25,vertical: 25),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 100, childAspectRatio: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),
+      itemCount: badges.length,
+      itemBuilder: (context, index) {
+         return AlignedMaterialButton(
+          child: Image.asset(AppAssets.badgePath + badges[index].fileName,width: 80,),
+          onTap: () {
+            _onTapBadgeItem(badges[index]);
+          },
+        );;
+      },
+    ));
   }
 
-  Future<List<BannerModel>> fetch() async {
+  Future<List<BadgeModel>> fetch() async {
     try {
       await Future.delayed(Duration(milliseconds: 300));
-      String rawJson = await DefaultAssetBundle.of(context).loadString("asset/json/banners.json");
+      String rawJson = await DefaultAssetBundle.of(context).loadString("asset/json/badges.json");
 
       Map bannerMap = jsonDecode(rawJson);
 
-      List<BannerModel> banners = [];
-      for (int i = 0; i < bannerMap['banners'].length; i++) {
-        banners.add(BannerModel.fromMap(bannerMap['banners'][i]));
+      List<BadgeModel> badges = [];
+      for (int i = 0; i < bannerMap['badges'].length; i++) {
+        badges.add(BadgeModel.fromMap(bannerMap['badges'][i]));
       }
 
-      return banners;
+      return badges;
     } catch (err) {
       print(err.toString());
       throw err;
     }
   }
 
-  void _onTapBannerItem(BannerModel item) {
-    print(item.no.toString());
+  void _onTapBadgeItem(BadgeModel item) {
     Navigator.pop(context, item);
   }
 }

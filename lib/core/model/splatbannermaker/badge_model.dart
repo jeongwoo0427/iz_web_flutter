@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-class BannerModel {
-  BannerModel({
+class BadgeModel {
+  BadgeModel({
     required this.no,
     required this.name,
     required this.fileName,
@@ -14,8 +14,8 @@ class BannerModel {
   final String rareLevel;
 
 
-  factory BannerModel.fromMap(Map<String, dynamic> map) => BannerModel(
-    no: map["no"],
+  factory BadgeModel.fromMap(Map<String, dynamic> map) => BadgeModel(
+    no : map["no"],
     name: map["name"],
     fileName: map["fileName"],
     rareLevel: map["rareLevel"],
