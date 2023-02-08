@@ -104,7 +104,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
 
   Future<List<BadgeModel>> fetch() async {
     try {
-      await Future.delayed(Duration(milliseconds: 300));
+      await Future.delayed(Duration(milliseconds: 600));
       String rawJson = await DefaultAssetBundle.of(context).loadString("asset/json/badges.json");
 
       Map bannerMap = jsonDecode(rawJson);
@@ -122,6 +122,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
   }
 
   void _onTapBadgeItem(BadgeModel item) {
+    print(item.fileName);
     Navigator.pop(context, item);
   }
 }

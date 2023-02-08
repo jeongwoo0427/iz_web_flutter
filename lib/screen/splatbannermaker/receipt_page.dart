@@ -37,14 +37,16 @@ class _ReceiptPageState extends State<ReceiptPage> {
   final TextEditingController _tagController = TextEditingController();
   final TextEditingController _mottoController = TextEditingController();
 
+  int _fontColor = 0;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _selectedBanner = BannerModel(no: 0, name: 'name', fileName: 'tile013.png', rareLevel: 'rareLevel');
-    _selectedBadge1 = BadgeModel(no: 0, name: 'name', fileName: 'tile000.png', rareLevel: 'rareLevel');
-    _selectedBadge2 = BadgeModel(no: 0, name: 'name', fileName: 'tile000.png', rareLevel: 'rareLevel');
-    _selectedBadge3 = BadgeModel(no: 0, name: 'name', fileName: 'tile000.png', rareLevel: 'rareLevel');
+    _selectedBadge1 = BadgeModel(no: 288, name: 'name', fileName: 'tile288.png', rareLevel: 'rareLevel');
+    _selectedBadge2 = BadgeModel(no: 288, name: 'name', fileName: 'tile288.png', rareLevel: 'rareLevel');
+    _selectedBadge3 = BadgeModel(no: 288, name: 'name', fileName: 'tile288.png', rareLevel: 'rareLevel');
   }
 
   @override
@@ -80,7 +82,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '2. 배찌를 선택해 주세요',
+              '2. 배찌를 선택해 주세요.',
             ),
             SizedBox(
               height: 30,
@@ -113,7 +115,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '3. 닉네임을 입력해주세요',
+              '3. 닉네임을 입력해주세요.',
             ),
             SizedBox(
               height: 30,
@@ -123,7 +125,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 Expanded(
                     flex: 4,
                     child: RoundedTextFieldWidget(
-                      hint: 'ex) 이즈빌런',
+                      hint: 'ex) 겸사단',
                       controller: _nicknameController,
                       onChanged: (text) {
                         setState(() {});
@@ -136,7 +138,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '4. 태그번호를 입력해주세요',
+              '4. 태그번호를 입력해주세요.',
             ),
             SizedBox(
               height: 30,
@@ -146,7 +148,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 Expanded(
                     flex: 4,
                     child: RoundedTextFieldWidget(
-                      hint: 'ex) #3306',
+                      hint: 'ex) #2580',
                       controller: _tagController,
                       onChanged: (text) {
                         setState(() {});
@@ -159,7 +161,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '5. 좌우명을 입력해주세요',
+              '5. 좌우명을 입력해주세요.',
             ),
             SizedBox(
               height: 30,
@@ -169,7 +171,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 Expanded(
                     flex: 4,
                     child: RoundedTextFieldWidget(
-                      hint: 'ex) 에어리어에 푹 빠진',
+                      hint: 'ex) 밀크팀에 푹 빠진',
                       controller: _mottoController,
                       onChanged: (text) {
                         setState(() {});
@@ -182,7 +184,58 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '6. 결과를 확인해주세요',
+              '6. 글자 색상을 선택해주세요.',
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            SizedBox(
+              height: 90,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _fontColor = 0;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 600),
+                      curve: Curves.decelerate,
+                      width: _fontColor==0?80:60,
+                      height:_fontColor==0?80:60,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100), color: Colors.black, border: Border.all(color: _fontColor==0?colorScheme.primary:Colors.grey, width: 3)),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 30,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _fontColor = 1;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 600),
+                      curve: Curves.decelerate,
+                      width: _fontColor==1?80:60,
+                      height: _fontColor==1?80:60,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100), color: Colors.white, border: Border.all(color: _fontColor==1?colorScheme.primary:Colors.grey, width: 3)),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 100,
+            ),
+            Text(
+              '7. 결과를 확인해주세요',
             ),
             SizedBox(
               height: 30,
@@ -242,22 +295,24 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: Center(
                   child: Text(
                     _nicknameController.text,
-                    style: TextStyle(fontSize: 34, fontWeight: FontWeight.w300, color: Colors.black, fontFamily: AppFontFamily.splatoon2_k),
+                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.splatoon2_k),
                   ),
                 )),
                 Positioned(
-                  top: 5,
+                    top: 5,
                     left: 8,
                     child: Text(
                       _mottoController.text,
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black, fontFamily: AppFontFamily.cookie_run),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
                     )),
                 Positioned(
                     bottom: 5,
                     left: 13,
                     child: Text(
                       _tagController.text,
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: Colors.black, fontFamily: AppFontFamily.cookie_run),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
                     ))
               ],
             ),

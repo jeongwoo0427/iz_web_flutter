@@ -43,19 +43,12 @@ class _NavigationWidgetState extends State<NavigationWidget> {
                     color: widget.showBackColor ? colorScheme.onBackground : Colors.white.withOpacity(0.9)),
               ),
               ResponsiveWrapper.of(context).isSmallerThan(TABLET)
-                  ? Icon(Icons.menu, color: widget.showBackColor ? colorScheme.onBackground : Colors.white.withOpacity(0.9))
-                  : DefaultTextStyle(
-                style: TextStyle(fontSize: 18,color: widget.showBackColor ? colorScheme.onBackground : Colors.white.withOpacity(0.9)),
-                child: Row(
-                  children: const [
-                    Text('hi'),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text('hello')
-                  ],
-                ),
-              )
+                  ? Text('넴플메이커')
+                  : Row(
+                    children: const [
+                      Text('넴플메이커')
+                    ],
+                  )
             ],
           ),
         ));
