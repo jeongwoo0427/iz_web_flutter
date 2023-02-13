@@ -38,6 +38,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
   final TextEditingController _mottoController = TextEditingController();
 
   int _fontColor = 0;
+  double _fontSizeRatio = 0.5;
+  double _badgeSizeRatio = 0.5;
+
 
   @override
   void initState() {
@@ -82,7 +85,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '2. 배찌를 선택해 주세요.',
+              '2. 뱃지를 선택해 주세요.',
             ),
             SizedBox(
               height: 30,
@@ -235,7 +238,36 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 100,
             ),
             Text(
-              '7. 결과를 확인해주세요',
+              '7. 각 요소별 크기를 정합니다.',
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+              Text('글자크기'), 
+              Expanded(child: Slider(value: _fontSizeRatio, onChanged: (value){
+                setState(() {
+                  _fontSizeRatio = value;
+                });
+              },divisions: 6,label: '글자크기',)),
+            ],),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Text('뱃지크기'),
+                Expanded(child: Slider(value: _badgeSizeRatio, onChanged: (value){
+                  setState(() {
+                    _badgeSizeRatio = value;
+                  });
+                },divisions: 6,label: '뱃지크기',)),
+              ],),
+            SizedBox(
+              height: 100,
+            ),
+            Text(
+              '8. 따란~',
             ),
             SizedBox(
               height: 30,
@@ -272,21 +304,21 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     children: [
                       Image.asset(
                         AppAssets.badgePath + _selectedBadge1.fileName,
-                        width: 37,
+                        width: 32+(_badgeSizeRatio*10), //originalSize: 37
                       ),
                       SizedBox(
                         width: 4,
                       ),
                       Image.asset(
                         AppAssets.badgePath + _selectedBadge2.fileName,
-                        width: 37,
+                        width: 32+(_badgeSizeRatio*10), //originalSize: 37
                       ),
                       SizedBox(
                         width: 4,
                       ),
                       Image.asset(
                         AppAssets.badgePath + _selectedBadge3.fileName,
-                        width: 37,
+                        width: 32+(_badgeSizeRatio*10), //originalSize: 37
                       )
                     ],
                   ),
@@ -294,25 +326,25 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 Positioned.fill(
                     child: Center(
                   child: Text(
-                    _nicknameController.text,
-                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.splatoon2_k),
+                    _nicknameController.text,  //originalSize: 36
+                    style: TextStyle(fontSize: 26+(_fontSizeRatio*20), fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.splatoon2_k),
                   ),
                 )),
                 Positioned(
                     top: 5,
                     left: 8,
                     child: Text(
-                      _mottoController.text,
+                      _mottoController.text, //originalSize: 15
                       style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
+                          TextStyle(fontSize: 11.5+(_fontSizeRatio*7), fontWeight: FontWeight.w600, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
                     )),
                 Positioned(
                     bottom: 5,
                     left: 13,
                     child: Text(
-                      _tagController.text,
+                      _tagController.text,  //originalSize: 13
                       style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
+                          TextStyle(fontSize: 9.5+(_fontSizeRatio*7), fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
                     ))
               ],
             ),
