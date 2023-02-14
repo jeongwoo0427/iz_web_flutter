@@ -1,12 +1,16 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:iz_web_flutter/constant/app_font_family.dart';
+import 'package:iz_web_flutter/core/mixin/dialog_mixin.dart';
 import 'package:iz_web_flutter/core/model/splatbannermaker/badge_model.dart';
 import 'package:iz_web_flutter/core/model/splatbannermaker/banner_model.dart';
+import 'package:iz_web_flutter/core/model/splatbannermaker/receipt_model.dart';
+import 'package:iz_web_flutter/core/service/api/data/splatbannermaker_data.dart';
 import 'package:iz_web_flutter/widget/input/rounded_textfield_widget.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'dart:ui' as ui;
@@ -25,7 +29,7 @@ class ReceiptPage extends StatefulWidget {
   State<ReceiptPage> createState() => _ReceiptPageState();
 }
 
-class _ReceiptPageState extends State<ReceiptPage> {
+class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
   final GlobalKey genKey = GlobalKey();
 
   late BannerModel _selectedBanner;
@@ -41,12 +45,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
   double _fontSizeRatio = 0.5;
   double _badgeSizeRatio = 0.5;
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _selectedBanner = BannerModel(no: 0, name: 'name', fileName: 'tile013.png', rareLevel: 'rareLevel');
+    _selectedBanner = BannerModel(no: 13, name: 'name', fileName: 'tile013.png', rareLevel: 'rareLevel');
     _selectedBadge1 = BadgeModel(no: 288, name: 'name', fileName: 'tile288.png', rareLevel: 'rareLevel');
     _selectedBadge2 = BadgeModel(no: 288, name: 'name', fileName: 'tile288.png', rareLevel: 'rareLevel');
     _selectedBadge3 = BadgeModel(no: 288, name: 'name', fileName: 'tile288.png', rareLevel: 'rareLevel');
@@ -196,7 +199,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               height: 90,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -207,10 +210,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 600),
                       curve: Curves.decelerate,
-                      width: _fontColor==0?80:60,
-                      height:_fontColor==0?80:60,
+                      width: _fontColor == 0 ? 80 : 60,
+                      height: _fontColor == 0 ? 80 : 60,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100), color: Colors.black, border: Border.all(color: _fontColor==0?colorScheme.primary:Colors.grey, width: 3)),
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.black,
+                          border: Border.all(color: _fontColor == 0 ? colorScheme.primary : Colors.grey, width: 3)),
                     ),
                   ),
                   SizedBox(
@@ -225,10 +230,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 600),
                       curve: Curves.decelerate,
-                      width: _fontColor==1?80:60,
-                      height: _fontColor==1?80:60,
+                      width: _fontColor == 1 ? 80 : 60,
+                      height: _fontColor == 1 ? 80 : 60,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100), color: Colors.white, border: Border.all(color: _fontColor==1?colorScheme.primary:Colors.grey, width: 3)),
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.white,
+                          border: Border.all(color: _fontColor == 1 ? colorScheme.primary : Colors.grey, width: 3)),
                     ),
                   )
                 ],
@@ -246,23 +253,37 @@ class _ReceiptPageState extends State<ReceiptPage> {
             Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-              Text('글자크기'), 
-              Expanded(child: Slider(value: _fontSizeRatio, onChanged: (value){
-                setState(() {
-                  _fontSizeRatio = value;
-                });
-              },divisions: 6,label: '글자크기',)),
-            ],),
+                Text('글자크기'),
+                Expanded(
+                    child: Slider(
+                  value: _fontSizeRatio,
+                  onChanged: (value) {
+                    setState(() {
+                      _fontSizeRatio = value;
+                    });
+                  },
+                  divisions: 10,
+                  label: '글자크기',
+                )),
+              ],
+            ),
             Row(
               mainAxisSize: MainAxisSize.max,
               children: [
                 Text('뱃지크기'),
-                Expanded(child: Slider(value: _badgeSizeRatio, onChanged: (value){
-                  setState(() {
-                    _badgeSizeRatio = value;
-                  });
-                },divisions: 6,label: '뱃지크기',)),
-              ],),
+                Expanded(
+                    child: Slider(
+                  value: _badgeSizeRatio,
+                  onChanged: (value) {
+                    setState(() {
+                      _badgeSizeRatio = value;
+                    });
+                  },
+                  divisions: 10,
+                  label: '뱃지크기',
+                )),
+              ],
+            ),
             SizedBox(
               height: 100,
             ),
@@ -276,7 +297,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
             SizedBox(
               height: 100,
             ),
-            RoundedElevatedButton(onPressed: _onPressedSave, child: Text('Save')),
+            Align(
+              child: SizedBox(width: 200, child: RoundedElevatedButton(onPressed: _onPressedSave, child: Text('Save'))),
+              alignment: Alignment.center,
+            ),
             SizedBox(
               height: 100,
             ),
@@ -291,65 +315,74 @@ class _ReceiptPageState extends State<ReceiptPage> {
       child: RepaintBoundary(
           key: genKey,
           child: Container(
-            child: Stack(
-              children: [
-                Image.asset(
-                  AppAssets.bannerPath + _selectedBanner.fileName,
-                  width: 400,
-                ),
-                Positioned(
-                  right: 5,
-                  bottom: 3,
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        AppAssets.badgePath + _selectedBadge1.fileName,
-                        width: 32+(_badgeSizeRatio*10), //originalSize: 37
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Image.asset(
-                        AppAssets.badgePath + _selectedBadge2.fileName,
-                        width: 32+(_badgeSizeRatio*10), //originalSize: 37
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Image.asset(
-                        AppAssets.badgePath + _selectedBadge3.fileName,
-                        width: 32+(_badgeSizeRatio*10), //originalSize: 37
-                      )
-                    ],
+              child: Stack(
+                children: [
+                  Image.asset(
+                    AppAssets.bannerPath + _selectedBanner.fileName,
+                    width: 400,
                   ),
-                ),
-                Positioned.fill(
-                    child: Center(
-                  child: Text(
-                    _nicknameController.text,  //originalSize: 36
-                    style: TextStyle(fontSize: 26+(_fontSizeRatio*20), fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.splatoon2_k),
+                  Positioned(
+                    right: 5,
+                    bottom: 3,
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          AppAssets.badgePath + _selectedBadge1.fileName,
+                          width: 32 + (_badgeSizeRatio * 10), //originalSize: 37
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Image.asset(
+                          AppAssets.badgePath + _selectedBadge2.fileName,
+                          width: 32 + (_badgeSizeRatio * 10), //originalSize: 37
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Image.asset(
+                          AppAssets.badgePath + _selectedBadge3.fileName,
+                          width: 32 + (_badgeSizeRatio * 10), //originalSize: 37
+                        )
+                      ],
+                    ),
                   ),
-                )),
-                Positioned(
-                    top: 5,
-                    left: 8,
+                  Positioned.fill(
+                      child: Center(
                     child: Text(
-                      _mottoController.text, //originalSize: 15
-                      style:
-                          TextStyle(fontSize: 11.5+(_fontSizeRatio*7), fontWeight: FontWeight.w600, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
-                    )),
-                Positioned(
-                    bottom: 5,
-                    left: 13,
-                    child: Text(
-                      _tagController.text,  //originalSize: 13
-                      style:
-                          TextStyle(fontSize: 9.5+(_fontSizeRatio*7), fontWeight: FontWeight.w300, color: _fontColor==0? Colors.black:Colors.white, fontFamily: AppFontFamily.cookie_run),
-                    ))
-              ],
-            ),
-            color: Colors.transparent
-          )),
+                      _nicknameController.text, //originalSize: 36
+                      style: TextStyle(
+                          fontSize: 26 + (_fontSizeRatio * 20),
+                          fontWeight: FontWeight.w300,
+                          color: _fontColor == 0 ? Colors.black : Colors.white,
+                          fontFamily: AppFontFamily.splatoon2_k),
+                    ),
+                  )),
+                  Positioned(
+                      top: 5,
+                      left: 8,
+                      child: Text(
+                        _mottoController.text, //originalSize: 15
+                        style: TextStyle(
+                            fontSize: 11.5 + (_fontSizeRatio * 7),
+                            fontWeight: FontWeight.w600,
+                            color: _fontColor == 0 ? Colors.black : Colors.white,
+                            fontFamily: AppFontFamily.cookie_run),
+                      )),
+                  Positioned(
+                      bottom: 5,
+                      left: 13,
+                      child: Text(
+                        _tagController.text, //originalSize: 13
+                        style: TextStyle(
+                            fontSize: 9.5 + (_fontSizeRatio * 7),
+                            fontWeight: FontWeight.w300,
+                            color: _fontColor == 0 ? Colors.black : Colors.white,
+                            fontFamily: AppFontFamily.cookie_run),
+                      ))
+                ],
+              ),
+              color: Colors.transparent)),
     );
   }
 
@@ -365,8 +398,25 @@ class _ReceiptPageState extends State<ReceiptPage> {
       final anchor = AnchorElement(href: "data:application/octet-stream;charset=utf-16le;base64,$content")
         ..setAttribute("download", "splatbanner.png")
         ..click();
-    } catch (ex) {
-      //TODO: 오류처리하기
+
+      ReceiptModel receiptModel = ReceiptModel(
+          receiptNo: 0,
+          bannerNo: _selectedBanner.no,
+          badge1No: _selectedBadge1.no,
+          badge2No: _selectedBadge2.no,
+          badge3No: _selectedBadge3.no,
+          nickname: _nicknameController.text,
+          tag: _tagController.text,
+          motto: _mottoController.text,
+          fontColor: _fontColor,
+          fontSizeRatio: _fontSizeRatio,
+          badgeSizeRatio: _badgeSizeRatio);
+
+      ReceiptModel? newReceiptModel = await SplatBannerMakerData().newReceipt(receiptModel);
+      print(newReceiptModel?.receiptNo.toString());
+    } catch (err) {
+      handlingErrorDialog(context, err);
+      //log(ex.toString(), stackTrace: StackTrace.current);
     }
   }
 

@@ -12,7 +12,7 @@ class APIService {
   final String baseUrl;
 
   APIService({
-    this.baseUrl = 'http://211.43.14.38:33/api',
+    this.baseUrl = 'http://veiz.site:33/api',
   });
 
   Future<Response> request(String pathString,
