@@ -58,18 +58,21 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return ConstrainedLayout(
-      child: DefaultTextStyle(
-        style: TextStyle(
-          color: colorScheme.onBackground,
-          fontWeight: FontWeight.w800,
-          fontFamily: AppFontFamily.cookie_run,
-          fontSize:
-              ResponsiveValue<double>(context, defaultValue: 24, valueWhen: [const Condition.smallerThan(name: TABLET, value: 18)]).value,
-        ),
-        child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15),
-          children: [
+
+    return DefaultTextStyle(
+      style: TextStyle(
+        color: colorScheme.onBackground,
+        fontWeight: FontWeight.w800,
+        fontFamily: AppFontFamily.cookie_run,
+        fontSize:
+            ResponsiveValue<double>(context, defaultValue: 24, valueWhen: [const Condition.smallerThan(name: TABLET, value: 18)]).value,
+      ),
+      child: ListView(
+        padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15),
+        children: [
+          ConstrainedLayout(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             SizedBox(
               height: 50,
             ),
@@ -256,15 +259,15 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
                 Text('글자크기'),
                 Expanded(
                     child: Slider(
-                  value: _fontSizeRatio,
-                  onChanged: (value) {
-                    setState(() {
-                      _fontSizeRatio = value;
-                    });
-                  },
-                  divisions: 10,
-                  label: '글자크기',
-                )),
+                      value: _fontSizeRatio,
+                      onChanged: (value) {
+                        setState(() {
+                          _fontSizeRatio = value;
+                        });
+                      },
+                      divisions: 10,
+                      label: '글자크기',
+                    )),
               ],
             ),
             Row(
@@ -273,15 +276,15 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
                 Text('뱃지크기'),
                 Expanded(
                     child: Slider(
-                  value: _badgeSizeRatio,
-                  onChanged: (value) {
-                    setState(() {
-                      _badgeSizeRatio = value;
-                    });
-                  },
-                  divisions: 10,
-                  label: '뱃지크기',
-                )),
+                      value: _badgeSizeRatio,
+                      onChanged: (value) {
+                        setState(() {
+                          _badgeSizeRatio = value;
+                        });
+                      },
+                      divisions: 10,
+                      label: '뱃지크기',
+                    )),
               ],
             ),
             SizedBox(
@@ -304,8 +307,8 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
             SizedBox(
               height: 100,
             ),
-          ],
-        ),
+          ],))
+        ],
       ),
     );
   }
