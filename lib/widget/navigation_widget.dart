@@ -58,9 +58,10 @@ class _NavigationWidgetState extends State<NavigationWidget> {
                         ? colorScheme.onBackground
                         : Colors.white.withOpacity(0.9)),
               ),
-              ResponsiveWrapper.of(context).isSmallerThan(TABLET)
-                  ? Text('넴플메이커')
-                  : Row(
+              // ResponsiveWrapper.of(context).isSmallerThan(TABLET)
+              //     ? Text('넴플메이커')
+              //     :
+              Row(
                       children: [
                         GestureDetector(
                           child: Text('넴플메이커'),
@@ -70,7 +71,7 @@ class _NavigationWidgetState extends State<NavigationWidget> {
                         ),
                         SizedBox(width: 20,),
                         GestureDetector(
-                          child: Text('테스트'),
+                          child: Text('test'),
                           onTap: () {
                             context.goNamed(RouteNames.test_screen);
                           },
