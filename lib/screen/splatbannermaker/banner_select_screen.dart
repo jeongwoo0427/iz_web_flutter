@@ -7,6 +7,7 @@ import 'package:iz_web_flutter/core/implement/future_status.dart';
 import 'package:iz_web_flutter/widget/button/AlignedMaterialButton.dart';
 import 'package:iz_web_flutter/widget/error_action_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/constrained_layout.dart';
+import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
 
 import '../../core/model/splatbannermaker/banner_model.dart';
 
@@ -29,7 +30,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WebResponsiveScaffold(
       appBar: AppBar(),
       body: FutureBuilder<List<BannerModel>>(
         future: bannersFuture,
@@ -52,7 +53,9 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
   @override
   Widget buildLoader() {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: Padding(
+          padding:EdgeInsets.symmetric(vertical: 100),
+          child: CircularProgressIndicator()),
     );
   }
 
@@ -87,6 +90,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
   Widget buildSuccess(List<BannerModel> banners) {
     return ConstrainedLayout(
       child: ListView.separated(
+        shrinkWrap: true,
         padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15, vertical: 20),
         itemCount: banners.length,
         separatorBuilder: (context, _) {

@@ -7,6 +7,7 @@ import 'package:iz_web_flutter/core/implement/future_status.dart';
 import 'package:iz_web_flutter/widget/button/AlignedMaterialButton.dart';
 import 'package:iz_web_flutter/widget/error_action_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/constrained_layout.dart';
+import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
 
 import '../../core/model/splatbannermaker/badge_model.dart';
 
@@ -29,7 +30,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WebResponsiveScaffold(
       appBar: AppBar(),
       body: FutureBuilder<List<BadgeModel>>(
         future: badgesFuture,
@@ -52,7 +53,9 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
   @override
   Widget buildLoader() {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: Padding(
+          padding:EdgeInsets.symmetric(vertical: 100),
+          child: CircularProgressIndicator()),
     );
   }
 
@@ -87,6 +90,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
   Widget buildSuccess(List<BadgeModel> badges) {
     return ConstrainedLayout(
         child: GridView.builder(
+          shrinkWrap: true,
           padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding25,vertical: 25),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 100, childAspectRatio: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),

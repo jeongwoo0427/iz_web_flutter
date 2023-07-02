@@ -7,15 +7,17 @@ import '../../constant/app_font_family.dart';
 import 'constrained_layout.dart';
 
 class WebResponsiveScaffold extends StatelessWidget {
+  final PreferredSizeWidget? appBar;
   final Widget? navigationWidget;
   final Widget? body;
 
-  const WebResponsiveScaffold({super.key, this.navigationWidget,this.body});
+  const WebResponsiveScaffold({super.key,this.appBar, this.navigationWidget,this.body});
 
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      appBar: appBar,
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -32,9 +34,9 @@ class WebResponsiveScaffold extends StatelessWidget {
                     const Condition.smallerThan(name: TABLET, value: 18)
                   ]).value,
             ),
-            child: ListView(
+            child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15),
-              children: [ConstrainedLayout(child: body ?? Container())],
+              child: ConstrainedLayout(child: body ?? Container()),
             ),
           ))
         ],
