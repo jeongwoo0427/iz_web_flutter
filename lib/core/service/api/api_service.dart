@@ -12,7 +12,7 @@ class APIService {
   final String baseUrl;
 
   APIService({
-    this.baseUrl = 'http://veiz.site:33/api',
+    this.baseUrl = 'http://izvillain.com:33/api',
   });
 
   Future<Response> request(String pathString,
@@ -71,7 +71,7 @@ class APIService {
         }
       }
 
-      throw '오류 : [${err.error}]';
+      throw '오류 : [${err.error.toString()}]';
     } catch (ex) {
       log('API_Service error) unknown error occurred');
       throw ex;

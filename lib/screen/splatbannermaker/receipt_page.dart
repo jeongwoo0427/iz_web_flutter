@@ -403,8 +403,8 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
 
       ReceiptModel? newReceiptModel = await SplatBannerMakerData().newReceipt(receiptModel);
       print(newReceiptModel?.receiptNo.toString());
-    } catch (err) {
-      handlingErrorDialog(context, err);
+    } catch (err,stack) {
+      handlingErrorDialog(context, err,stack);
       //log(ex.toString(), stackTrace: StackTrace.current);
     }
   }

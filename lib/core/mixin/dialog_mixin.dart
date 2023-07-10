@@ -108,7 +108,7 @@ mixin DialogMixin {
   }
 
 
-  Future<dynamic> handlingErrorDialog(BuildContext context, err) async{
+  Future<dynamic> handlingErrorDialog(BuildContext context, err, stack) async{
     if(err is HttpFailure){
       HttpFailure failure = err;
       log('error)${failure.message}',stackTrace: StackTrace.current,error: err);
@@ -125,10 +125,10 @@ mixin DialogMixin {
         await showAlertDialog(context, title: '오류', content: failure.message,positiveText: '확인');
       }
     }else if(err is String){
-      log('error)${err}',stackTrace: StackTrace.current,error: err);
+      log('error)${err}',stackTrace: stack,error: err);
       await showAlertDialog(context, title: '오류', content: err.toString(),positiveText: '확인');
     }else {
-      log('error) unknown error has occurred',stackTrace: StackTrace.current,error: err);
+      log('error) unknown error has occurred',stackTrace: stack,error: err);
       await showAlertDialog(context, title: '오류', content: '오류가 발생했습니다.',positiveText: '확인');
     }
   }
