@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iz_web_flutter/screen/portfolio/portfolio_screen.dart';
 import 'package:iz_web_flutter/screen/test/test_screen.dart';
@@ -17,24 +18,37 @@ class RouteNames {
 }
 
 class AppRouter {
-  final GoRouter router =
-      GoRouter(initialLocation: '/splatbannermaker', routes: [
-    GoRoute(path: '/', builder: (context, state) => SplatBannerMakerScreen()),
-    GoRoute(
-        name: RouteNames.RN_splatbannermaker_screen,
-        path: '/splatbannermaker',
-        builder: (context, state) => SplatBannerMakerScreen(),
-        routes: [
-          GoRoute(
-              name: RouteNames.RN_banner_select_screen,
-              path: 'bannerselect',
-              builder: (context, state) => BannerSelectScreen()),
-          GoRoute(
-              name: RouteNames.RN_badge_select_screen,
-              path: 'badgeselect',
-              builder: (context, state) => BadgeSelectScreen()),
-        ]),
-    GoRoute(name: RouteNames.RN_test_screen, path: '/test', builder: (context, state) => TestScreen()),
-    GoRoute(name: RouteNames.RN_portfolio_screen, path: '/portfolio', builder: (context, state) => PortfolioScreen())
+  final GoRouter router = GoRouter(initialLocation: '/splatbannermaker', routes: [
+    GoRoute(path: '/', pageBuilder: defaultPageBuilder(SplatBannerMakerScreen())),
+    GoRoute(name: RouteNames.RN_splatbannermaker_screen, path: '/splatbannermaker', pageBuilder: defaultPageBuilder(SplatBannerMakerScreen()), routes: [
+      GoRoute(name: RouteNames.RN_banner_select_screen, path: 'bannerselect', builder: (context, state) => BannerSelectScreen()),
+      GoRoute(name: RouteNames.RN_badge_select_screen, path: 'badgeselect', builder: (context, state) => BadgeSelectScreen()),
+    ]),
+    GoRoute(name: RouteNames.RN_test_screen, path: '/test', pageBuilder: defaultPageBuilder(TestScreen())),
+    GoRoute(name: RouteNames.RN_portfolio_screen, path: '/portfolio', pageBuilder: defaultPageBuilder(PortfolioScreen()))
   ]);
+}
+
+Page<dynamic> Function(BuildContext, GoRouterState) defaultPageBuilder<T>(Widget child, {String? type}) => (BuildContext context, GoRouterState state) {
+      return buildPageWithDefaultTransition<T>(context: context, state: state, child: child, type: type);
+    };
+
+CustomTransitionPage buildPageWithDefaultTransition<T>({required BuildContext context, required GoRouterState state, required Widget child, String? type}) {
+  return CustomTransitionPage<T>(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        switch (type) {
+          case 'fade':
+            return FadeTransition(opacity: animation, child: child);
+          case 'rotation':
+            return RotationTransition(turns: animation, child: child);
+          case 'size':
+            return SizeTransition(sizeFactor: animation, child: child);
+          case 'scale':
+            return ScaleTransition(scale: animation, child: child);
+          default:
+            return FadeTransition(opacity: animation, child: child);
+        }
+      });
 }
