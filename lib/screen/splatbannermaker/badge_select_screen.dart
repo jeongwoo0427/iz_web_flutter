@@ -54,7 +54,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
   Widget buildLoader() {
     return const Center(
       child: Padding(
-          padding:EdgeInsets.symmetric(vertical: 100),
+          padding: EdgeInsets.symmetric(vertical: 100),
           child: CircularProgressIndicator()),
     );
   }
@@ -88,28 +88,37 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
 
   @override
   Widget buildSuccess(List<BadgeModel> badges) {
-    return ConstrainedLayout(
-        child: GridView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding25,vertical: 25),
+    return GridView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      padding: EdgeInsets.symmetric(
+          horizontal: globalHorizonPadding25, vertical: 25),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 100, childAspectRatio: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),
+          maxCrossAxisExtent: 100,
+          childAspectRatio: 1,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10),
       itemCount: badges.length,
       itemBuilder: (context, index) {
-         return AlignedMaterialButton(
-          child: Image.asset(AppAssets.SPLAT_BADGE_PATH + badges[index].fileName,width: 80,),
+        return AlignedMaterialButton(
+          child: Image.asset(
+            AppAssets.SPLAT_BADGE_PATH + badges[index].fileName,
+            width: 80,
+          ),
           onTap: () {
             _onTapBadgeItem(badges[index]);
           },
-        );;
+        );
+        ;
       },
-    ));
+    );
   }
 
   Future<List<BadgeModel>> fetch() async {
     try {
       await Future.delayed(Duration(milliseconds: 600));
-      String rawJson = await DefaultAssetBundle.of(context).loadString("asset/json/badges.json");
+      String rawJson = await DefaultAssetBundle.of(context)
+          .loadString("asset/json/badges.json");
 
       Map bannerMap = jsonDecode(rawJson);
 

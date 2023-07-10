@@ -88,25 +88,24 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
 
   @override
   Widget buildSuccess(List<BannerModel> banners) {
-    return ConstrainedLayout(
-      child: ListView.separated(
-        shrinkWrap: true,
-        padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15, vertical: 20),
-        itemCount: banners.length,
-        separatorBuilder: (context, _) {
-          return SizedBox(
-            height: 15,
-          );
-        },
-        itemBuilder: (context, index) {
-          return AlignedMaterialButton(
-            child: Image.asset(AppAssets.SPLAT_BANNER_PATH + banners[index].fileName,width: 600,),
-            onTap: () {
-              _onTapBannerItem(banners[index]);
-            },
-          );
-        },
-      ),
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15, vertical: 20),
+      itemCount: banners.length,
+      separatorBuilder: (context, _) {
+        return SizedBox(
+          height: 15,
+        );
+      },
+      itemBuilder: (context, index) {
+        return AlignedMaterialButton(
+          child: Image.asset(AppAssets.SPLAT_BANNER_PATH + banners[index].fileName,width: 600,),
+          onTap: () {
+            _onTapBannerItem(banners[index]);
+          },
+        );
+      },
     );
   }
 
