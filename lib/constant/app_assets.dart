@@ -19,10 +19,12 @@ class AppAssets{
   //
   // static final String splash_background = 'asset/image/background/night_forest.jpg';
 
-  static final String test_badge = 'asset/image/badge/tile041.png';
+  static final String TEST_BADGE = 'asset/image/badge/tile041.png';
 
-  static const String bannerPath = 'asset/image/banner/';
-  static const String badgePath = 'asset/image/badge/';
+  static const String SPLAT_BANNER_PATH = 'asset/image/banner/';
+  static const String SPLAT_BADGE_PATH = 'asset/image/badge/';
+
+  static const String PORTFOIO_BANNER = 'asset/image/portfolio/banner.jpg';
 
 
 

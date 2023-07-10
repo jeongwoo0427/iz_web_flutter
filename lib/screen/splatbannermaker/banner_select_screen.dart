@@ -100,7 +100,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
         },
         itemBuilder: (context, index) {
           return AlignedMaterialButton(
-            child: Image.asset(AppAssets.bannerPath + banners[index].fileName,width: 600,),
+            child: Image.asset(AppAssets.SPLAT_BANNER_PATH + banners[index].fileName,width: 600,),
             onTap: () {
               _onTapBannerItem(banners[index]);
             },

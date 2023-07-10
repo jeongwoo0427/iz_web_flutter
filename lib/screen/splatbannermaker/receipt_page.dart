@@ -73,7 +73,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
         ),
         AlignedMaterialButton(
             onTap: _onTapBanner,
-            child: Image.asset(AppAssets.bannerPath + _selectedBanner.fileName,
+            child: Image.asset(AppAssets.SPLAT_BANNER_PATH + _selectedBanner.fileName,
                 width: ResponsiveValue<double>(context,
                     defaultValue: 600, valueWhen: [const Condition.smallerThan(name: TABLET, value: 400)]).value)),
         SizedBox(
@@ -91,19 +91,19 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
           children: [
             AlignedMaterialButton(
               onTap: _onTapBadge1,
-              child: Image.asset(AppAssets.badgePath + _selectedBadge1.fileName,
+              child: Image.asset(AppAssets.SPLAT_BADGE_PATH + _selectedBadge1.fileName,
                   width: ResponsiveValue<double>(context,
                       defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
             ),
             AlignedMaterialButton(
               onTap: _onTapBadge2,
-              child: Image.asset(AppAssets.badgePath + _selectedBadge2.fileName,
+              child: Image.asset(AppAssets.SPLAT_BADGE_PATH + _selectedBadge2.fileName,
                   width: ResponsiveValue<double>(context,
                       defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
             ),
             AlignedMaterialButton(
               onTap: _onTapBadge3,
-              child: Image.asset(AppAssets.badgePath + _selectedBadge3.fileName,
+              child: Image.asset(AppAssets.SPLAT_BADGE_PATH + _selectedBadge3.fileName,
                   width: ResponsiveValue<double>(context,
                       defaultValue: 100, valueWhen: [const Condition.smallerThan(name: TABLET, value: 80)]).value),
             ),
@@ -307,7 +307,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
               child: Stack(
                 children: [
                   Image.asset(
-                    AppAssets.bannerPath + _selectedBanner.fileName,
+                    AppAssets.SPLAT_BANNER_PATH + _selectedBanner.fileName,
                     width: 400,
                   ),
                   Positioned(
@@ -316,21 +316,21 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
                     child: Row(
                       children: [
                         Image.asset(
-                          AppAssets.badgePath + _selectedBadge1.fileName,
+                          AppAssets.SPLAT_BADGE_PATH + _selectedBadge1.fileName,
                           width: 32 + (_badgeSizeRatio * 10), //originalSize: 37
                         ),
                         SizedBox(
                           width: 4,
                         ),
                         Image.asset(
-                          AppAssets.badgePath + _selectedBadge2.fileName,
+                          AppAssets.SPLAT_BADGE_PATH + _selectedBadge2.fileName,
                           width: 32 + (_badgeSizeRatio * 10), //originalSize: 37
                         ),
                         SizedBox(
                           width: 4,
                         ),
                         Image.asset(
-                          AppAssets.badgePath + _selectedBadge3.fileName,
+                          AppAssets.SPLAT_BADGE_PATH + _selectedBadge3.fileName,
                           width: 32 + (_badgeSizeRatio * 10), //originalSize: 37
                         )
                       ],
@@ -411,7 +411,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
 
   Future<void> _onTapBanner() async {
     try {
-      final bannerResult = await context.pushNamed(RouteNames.banner_select_screen);
+      final bannerResult = await context.pushNamed(RouteNames.RN_banner_select_screen);
       if (bannerResult == null) return;
 
       setState(() {
@@ -424,7 +424,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
 
   Future<void> _onTapBadge1() async {
     try {
-      final badgeResult = await context.pushNamed(RouteNames.badge_select_screen);
+      final badgeResult = await context.pushNamed(RouteNames.RN_badge_select_screen);
       if (badgeResult == null) return;
 
       setState(() {
@@ -437,7 +437,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
 
   Future<void> _onTapBadge2() async {
     try {
-      final badgeResult = await context.pushNamed(RouteNames.badge_select_screen);
+      final badgeResult = await context.pushNamed(RouteNames.RN_badge_select_screen);
       if (badgeResult == null) return;
 
       setState(() {
@@ -450,7 +450,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
 
   Future<void> _onTapBadge3() async {
     try {
-      final badgeResult = await context.pushNamed(RouteNames.badge_select_screen);
+      final badgeResult = await context.pushNamed(RouteNames.RN_badge_select_screen);
       if (badgeResult == null) return;
 
       setState(() {

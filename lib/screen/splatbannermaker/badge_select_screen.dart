@@ -97,7 +97,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
       itemCount: badges.length,
       itemBuilder: (context, index) {
          return AlignedMaterialButton(
-          child: Image.asset(AppAssets.badgePath + badges[index].fileName,width: 80,),
+          child: Image.asset(AppAssets.SPLAT_BADGE_PATH + badges[index].fileName,width: 80,),
           onTap: () {
             _onTapBadgeItem(badges[index]);
           },
