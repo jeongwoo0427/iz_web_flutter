@@ -123,7 +123,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
             Expanded(
                 flex: 4,
                 child: RoundedTextFieldWidget(
-                  hint: 'ex) 겸사단',
+                  hint: 'ex) 샤아랄라랄랄라',
                   controller: _nicknameController,
                   onChanged: (text) {
                     setState(() {});
@@ -169,7 +169,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
             Expanded(
                 flex: 4,
                 child: RoundedTextFieldWidget(
-                  hint: 'ex) 밀크팀에 푹 빠진',
+                  hint: 'ex) 보틀사랑자',
                   controller: _mottoController,
                   onChanged: (text) {
                     setState(() {});
@@ -376,19 +376,35 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
   }
 
   Future<void> _onPressedSave() async {
+
+
+
     try {
       final RenderRepaintBoundary boundary = genKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 5);
 
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
       Uint8List? pngBytes = byteData?.buffer.asUint8List();
 
+
       final content = base64Encode(pngBytes!.toList());
+
+
       final anchor = AnchorElement(href: "data:application/octet-stream;charset=utf-16le;base64,$content")
         ..setAttribute("download", "splatbanner.png")
         ..click();
 
-      ReceiptModel receiptModel = ReceiptModel(
+
+    } catch (err,stack) {
+      //handlingErrorDialog(context, err,stack);
+      log(err.toString(), stackTrace: StackTrace.current);
+    }
+
+
+
+
+    ReceiptModel receiptModel = ReceiptModel(
           receiptNo: 0,
           bannerNo: _selectedBanner.no,
           badge1No: _selectedBadge1.no,
@@ -403,10 +419,7 @@ class _ReceiptPageState extends State<ReceiptPage> with DialogMixin {
 
       ReceiptModel? newReceiptModel = await SplatBannerMakerData().newReceipt(receiptModel);
       print(newReceiptModel?.receiptNo.toString());
-    } catch (err,stack) {
-      handlingErrorDialog(context, err,stack);
-      //log(ex.toString(), stackTrace: StackTrace.current);
-    }
+
   }
 
   Future<void> _onTapBanner() async {

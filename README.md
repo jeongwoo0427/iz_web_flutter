@@ -5,6 +5,11 @@
 Flutter v3.10.6
 AndroidStudio
 
+
+#Test Info
+웹호스팅모드로 디버그테스트를 진행 할 경우 실행할 프롬프트
+fvm flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8989
+
 #Publish Info
 릴리즈버전 빌드시 사용 명령어 : fvm flutter build web --web-renderer canvaskit --release
 빌드 후 할것 :
