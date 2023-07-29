@@ -60,7 +60,7 @@ class _NavigationWidgetState extends State<NavigationWidget> {
                     width: 20,
                   ),
                   GestureDetector(
-                    child: Text('test',style: TextStyle(
+                    child: Text('테스트',style: TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w500, color: widget.showBackColor ? colorScheme.onBackground : Colors.white.withOpacity(0.9)),),
                     onTap: () {
                       context.goNamed(RouteNames.RN_test_screen);
