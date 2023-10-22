@@ -24,7 +24,7 @@ class BombGame extends FlameGame{
     await images.loadAllImages();
 
     
-    cam = CameraComponent.withFixedResolution(width: 1024, height: 768, world: level1);
+    cam = CameraComponent.withFixedResolution(width: 640, height: 368, world: level1);
 
     cam.viewfinder.anchor = Anchor.topLeft;
 

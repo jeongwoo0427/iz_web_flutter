@@ -20,7 +20,7 @@ class _BombGameScreenState extends State<BombGameScreen> {
         children: [
           SizedBox(height: 50,),
           AspectRatio(
-              aspectRatio: 1024/768,child: GameWidget(game: BombGame(),))
+              aspectRatio: 640/368,child: GameWidget(game: BombGame(),))
         ],
       ),
     );

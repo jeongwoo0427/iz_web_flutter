@@ -72,7 +72,11 @@ flutter:
     - assets/image/portfolio/
     - assets/json/
     - assets/game/bomb/
-    - assets/game/bomb/8-Tile-Sets/
+    - assets/game/bomb/Images/Terrain/
+    - assets/game/bomb/Images/Main Characters/Mask Dude/
+    - assets/game/bomb/Images/Main Characters/Ninja Frog/
+    - assets/game/bomb/Images/Main Characters/Pink Man/
+    - assets/game/bomb/Images/Main Characters/Virtual Guy/
 
 
 
