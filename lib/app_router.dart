@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iz_web_flutter/screen/game/bomb_game_screen.dart';
 import 'package:iz_web_flutter/screen/portfolio/portfolio_screen.dart';
 import 'package:iz_web_flutter/screen/test/test_screen.dart';
 
@@ -11,6 +12,8 @@ class RouteNames {
   static const String RN_splatbannermaker_screen = 'SplatBannerMakerScreen';
   static const String RN_banner_select_screen = 'BannerSelectScreen';
   static const String RN_badge_select_screen = 'BadgeSelectScreen';
+
+  static const String RN_bomb_game_screen = 'BombGameScreen';
 
   static const String RN_test_screen = 'TestScreen';
 
@@ -24,6 +27,7 @@ class AppRouter {
       GoRoute(name: RouteNames.RN_banner_select_screen, path: 'bannerselect', builder: (context, state) => BannerSelectScreen()),
       GoRoute(name: RouteNames.RN_badge_select_screen, path: 'badgeselect', builder: (context, state) => BadgeSelectScreen()),
     ]),
+    GoRoute(name: RouteNames.RN_bomb_game_screen, path: '/bombgame', pageBuilder: defaultPageBuilder(BombGameScreen())),
     GoRoute(name: RouteNames.RN_test_screen, path: '/test', pageBuilder: defaultPageBuilder(TestScreen())),
     GoRoute(name: RouteNames.RN_portfolio_screen, path: '/portfolio', pageBuilder: defaultPageBuilder(PortfolioScreen()))
   ]);

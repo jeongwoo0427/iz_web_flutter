@@ -118,7 +118,7 @@ class _BadgeSelectScreenState extends State<BadgeSelectScreen> {
     try {
       await Future.delayed(Duration(milliseconds: 600));
       String rawJson = await DefaultAssetBundle.of(context)
-          .loadString("asset/json/badges.json");
+          .loadString("assets/json/badges.json");
 
       Map bannerMap = jsonDecode(rawJson);
 

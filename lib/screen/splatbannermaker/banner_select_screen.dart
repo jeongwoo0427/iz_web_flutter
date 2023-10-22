@@ -112,7 +112,7 @@ class _BannerSelectScreenState extends State<BannerSelectScreen> {
   Future<List<BannerModel>> fetch() async {
     try {
       await Future.delayed(Duration(milliseconds: 300));
-      String rawJson = await DefaultAssetBundle.of(context).loadString("asset/json/banners.json");
+      String rawJson = await DefaultAssetBundle.of(context).loadString("assets/json/banners.json");
 
       Map bannerMap = jsonDecode(rawJson);
 
