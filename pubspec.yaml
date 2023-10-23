@@ -71,12 +71,12 @@ flutter:
     - assets/image/badge/
     - assets/image/portfolio/
     - assets/json/
-    - assets/game/bomb/
-    - assets/game/bomb/Images/Terrain/
-    - assets/game/bomb/Images/Main Characters/Mask Dude/
-    - assets/game/bomb/Images/Main Characters/Ninja Frog/
-    - assets/game/bomb/Images/Main Characters/Pink Man/
-    - assets/game/bomb/Images/Main Characters/Virtual Guy/
+    - assets/game/adventure/
+    - assets/game/adventure/Images/Terrain/
+    - assets/game/adventure/Images/Main Characters/Mask Dude/
+    - assets/game/adventure/Images/Main Characters/Ninja Frog/
+    - assets/game/adventure/Images/Main Characters/Pink Man/
+    - assets/game/adventure/Images/Main Characters/Virtual Guy/
 
 
 

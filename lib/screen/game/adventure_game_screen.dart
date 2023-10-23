@@ -1,8 +1,9 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:iz_web_flutter/bomb_game/bomb_game.dart';
 import 'package:iz_web_flutter/widget/navigation_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
+
+import '../../adventure_game/adventure_game.dart';
 
 class BombGameScreen extends StatefulWidget {
   const BombGameScreen({super.key});
@@ -20,7 +21,7 @@ class _BombGameScreenState extends State<BombGameScreen> {
         children: [
           SizedBox(height: 50,),
           AspectRatio(
-              aspectRatio: 640/368,child: GameWidget(game: BombGame(),))
+              aspectRatio: 640/368,child: GameWidget(game: AdventureGame(),))
         ],
       ),
     );

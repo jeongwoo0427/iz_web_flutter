@@ -1,6 +1,8 @@
 
 import 'package:flame/components.dart';
-import 'package:iz_web_flutter/bomb_game/bomb_game.dart';
+
+import '../adventure_game.dart';
+
 
 
 enum PlayerState {
@@ -8,11 +10,11 @@ enum PlayerState {
   running,
 }
 
-class Player extends SpriteAnimationGroupComponent with HasGameRef<BombGame>{
+class Player extends SpriteAnimationGroupComponent with HasGameRef<AdventureGame>{
 
   String character;
 
-  Player({this.character = 'Mask Dude'});
+  Player({this.character = 'Mask Dude', required position}) : super(position: position);
 
   late final SpriteAnimation _idleAnimation;
   late final SpriteAnimation _runningAnimation;

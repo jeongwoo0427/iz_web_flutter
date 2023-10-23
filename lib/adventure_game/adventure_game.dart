@@ -4,15 +4,15 @@ import 'package:flame/camera.dart';
 import 'package:flame/game.dart';
 import 'package:flame/widgets.dart';
 
-import 'level/level1.dart';
+import 'level/level.dart';
 
-class BombGame extends FlameGame{
+class AdventureGame extends FlameGame{
 
-  static const String assetPrefix = 'assets/game/bomb/';
+  static const String assetPrefix = 'assets/game/adventure/';
 
   late final CameraComponent cam;
 
-  final Level1 level1 = Level1();
+  final Level level1 = Level(mapName: 'map1');
 
 
 

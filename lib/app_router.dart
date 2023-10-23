@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iz_web_flutter/screen/game/bomb_game_screen.dart';
+import 'package:iz_web_flutter/screen/game/adventure_game_screen.dart';
 import 'package:iz_web_flutter/screen/portfolio/portfolio_screen.dart';
 import 'package:iz_web_flutter/screen/test/test_screen.dart';
 
