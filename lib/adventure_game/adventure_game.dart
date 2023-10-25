@@ -1,12 +1,13 @@
 
 import 'package:flame/cache.dart';
 import 'package:flame/camera.dart';
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/widgets.dart';
 
 import 'level/level.dart';
 
-class AdventureGame extends FlameGame{
+class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
 
   static const String assetPrefix = 'assets/game/adventure/';
 
