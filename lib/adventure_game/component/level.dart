@@ -2,7 +2,7 @@
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 
-import '../actors/player.dart';
+import 'player.dart';
 import '../adventure_game.dart';
 
 

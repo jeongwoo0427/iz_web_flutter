@@ -8,17 +8,16 @@ import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'actors/player.dart';
-import 'level/level.dart';
+import 'component/player.dart';
+import 'component/level.dart';
 
-class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
-
+class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
   static const String assetPrefix = 'assets/game/adventure/';
   late final CameraComponent cam;
   late final JoystickComponent joystick;
   late Level level;
   late Player player;
-  bool showJoystic = false;
+  bool showJoystic = true;
 
   @override
   Color backgroundColor() {
@@ -27,7 +26,6 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
 
   @override
   Future<void> onLoad() async {
-
     assets.prefix = assetPrefix;
     images.prefix = assetPrefix;
     await images.loadAllImages();
@@ -60,7 +58,6 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
     return super.onLoad();
   }
 
-
   @override
   void update(double dt) {
     if (showJoystic) {
@@ -70,8 +67,10 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
   }
 
   @override
-  KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(
+      RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     // TODO : 반드시 최상위 게임 클래스에 HasKeyboardHandlerComponents mixin을 해줘야 사용이 가능하다.
+
     final bool isLeftKeyPressed =
         keysPressed.contains(LogicalKeyboardKey.keyA) ||
             keysPressed.contains(LogicalKeyboardKey.arrowLeft);
@@ -80,19 +79,12 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
         keysPressed.contains(LogicalKeyboardKey.keyD) ||
             keysPressed.contains(LogicalKeyboardKey.arrowRight);
 
-    player.playerMoveDirection = PlayerMovementDirection.none;
-    if (isLeftKeyPressed && isRightKeyPressed) {
-      player.playerMoveDirection = PlayerMovementDirection.none;
-    } else if (isLeftKeyPressed) {
-      player.playerMoveDirection = PlayerMovementDirection.left;
-    } else if (isRightKeyPressed) {
-      player.playerMoveDirection = PlayerMovementDirection.right;
-    }
+    player.horizontalMovement = 0;
+    player.horizontalMovement += isLeftKeyPressed ? -1 : 0;
+    player.horizontalMovement += isRightKeyPressed ? 1 : 0;
 
     return super.onKeyEvent(event, keysPressed);
   }
-
-
 
   void initJoystick(
       {double knobOpacity = 0.3, double backgroundOpacity = 0.5}) {
@@ -118,16 +110,17 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
   }
 
   void updateJoystic() {
+    player.horizontalMovement = 0;
     switch (joystick.direction) {
       case JoystickDirection.downLeft:
       case JoystickDirection.upLeft:
       case JoystickDirection.left:
-        player.playerMoveDirection = PlayerMovementDirection.left;
+        player.horizontalMovement += -1;
         break;
       case JoystickDirection.downRight:
       case JoystickDirection.upRight:
       case JoystickDirection.right:
-        player.playerMoveDirection = PlayerMovementDirection.right;
+        player.horizontalMovement += 1;
         break;
       case JoystickDirection.up:
         break;
@@ -135,9 +128,8 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents{
         break;
 
       default:
-        player.playerMoveDirection = PlayerMovementDirection.none;
+        player.horizontalMovement = 0;
         break;
     }
   }
-  
 }
