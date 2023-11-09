@@ -17,7 +17,7 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
   late final JoystickComponent joystick;
   late Level level;
   late Player player;
-  bool showJoystic = true;
+  bool showJoystic = false;
 
   @override
   Color backgroundColor() {
@@ -80,8 +80,8 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
             keysPressed.contains(LogicalKeyboardKey.arrowRight);
 
     player.horizontalMovement = 0;
-    player.horizontalMovement += isLeftKeyPressed ? -1 : 0;
-    player.horizontalMovement += isRightKeyPressed ? 1 : 0;
+    if(isLeftKeyPressed) player.horizontalMovement = -1;
+    if(isRightKeyPressed) player.horizontalMovement = 1;
 
     return super.onKeyEvent(event, keysPressed);
   }
@@ -115,20 +115,16 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
       case JoystickDirection.downLeft:
       case JoystickDirection.upLeft:
       case JoystickDirection.left:
-        player.horizontalMovement += -1;
+        player.horizontalMovement = -1;
         break;
       case JoystickDirection.downRight:
       case JoystickDirection.upRight:
       case JoystickDirection.right:
-        player.horizontalMovement += 1;
+        player.horizontalMovement = 1;
         break;
       case JoystickDirection.up:
         break;
       case JoystickDirection.down:
-        break;
-
-      default:
-        player.horizontalMovement = 0;
         break;
     }
   }
