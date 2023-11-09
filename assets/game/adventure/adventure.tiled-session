@@ -5,11 +5,11 @@
     ],
     "fileStates": {
         "map1.tmx": {
-            "scale": 3.614453125,
-            "selectedLayer": 0,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 176.92856370906736,
-                "y": 128.09683345941858
+                "x": 315.75,
+                "y": 174
             }
         },
         "terrain_tileset.tsx": {
