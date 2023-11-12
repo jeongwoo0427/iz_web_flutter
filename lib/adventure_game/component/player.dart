@@ -139,18 +139,23 @@ class Player extends SpriteAnimationGroupComponent
     isOnGround = false;
     for(int i = 0 ; i < collisionBlocks.length; i++){
       final block = collisionBlocks[i];
-      if(block.isPlatform){
-
+      if(block.isPlatform){//플래폼은 밑에서 위로 관통할 수 있어야 하므로 위에 닿을때의 액션은 제외됨.
+        if(checkCollision(this, block)){//바닥에 닿았을 경우 더이상 하강하지 못하도록
+          velocity.y = 0;
+          position.y = block.y - width;
+          isOnGround = true;
+          break;
+        }
       }else{
         if(checkCollision(this, block)){
-          if(velocity.y > 0){
+          if(velocity.y > 0){//바닥에 닿았을 경우 더이상 하강하지 못하도록
             velocity.y = 0;
             position.y = block.y - width;
             isOnGround = true;
             break;
           }
 
-          if(velocity.y < 0){
+          if(velocity.y < 0){//천장에 닿았을 경우 더이상 승강하지 못하도록
             velocity.y = 0;
             position.y = block.y + block.height;
           }

@@ -15,9 +15,11 @@ bool checkCollision(Player player, CollisionBlock block) {
   //플레이어가 왼쪽으로 이동할땐 좌,우 가 뒤집히기 때문에 그에 대한 대처를 함.
   final fixedX = player.scale.x < 0 ? playerX - playerWidth : playerX;
 
+  //점프를 할 경우 플랫폼에 닿았을때에 대한 대처를 함.
+  final fixedY = block.isPlatform ? playerY + playerHeight : playerY;
 
-  return (playerY < block.y + blockHeight &&
-      playerY + playerHeight > blockY &&
+  return (fixedY < block.y + blockHeight &&
+      fixedY + playerHeight > blockY &&
       fixedX < blockX + blockWidth &&
       fixedX + playerWidth > blockX
   );
