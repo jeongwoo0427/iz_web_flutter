@@ -83,6 +83,8 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
     if(isLeftKeyPressed) player.horizontalMovement = -1;
     if(isRightKeyPressed) player.horizontalMovement = 1;
 
+    player.hasJumped = keysPressed.contains(LogicalKeyboardKey.space);
+
     return super.onKeyEvent(event, keysPressed);
   }
 

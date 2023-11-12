@@ -18,16 +18,21 @@ class Player extends SpriteAnimationGroupComponent
 
   Player({required this.character, required position})
       : super(position: position){
-    debugMode = true;
+    debugMode = false;
   }
 
   //Animation Variables
   late final SpriteAnimation _idleAnimation;
   late final SpriteAnimation _runningAnimation;
 
-  double horizontalMovement = 0;
-  double moveSpeed = 100;
+  double horizontalMovement = 0; //움직임 방향 -1 : 좌 , 1 : 우 , 0 : 정지
+  double moveSpeed = 100; //움직임 속도
   Vector2 velocity = Vector2.zero();
+  final double _gravity = 18.5;//중력
+  final double _jumpForce = 400;//점프력
+  final double _terminalVelocity = 400; //최대추락속도
+  bool isOnGround = false;
+  bool hasJumped = false;
 
   //Player객체는 직접 본인의 collision들을 알아야 한다.
   List<CollisionBlock> collisionBlocks = [];
@@ -44,7 +49,9 @@ class Player extends SpriteAnimationGroupComponent
   void update(double dt) {
     _updatePlayerState();
     _updatePlayerMovement(dt);
-    _checkHorizontalCollisions();
+    _applyHorizontalCollisions();
+    _applyGravity(dt);
+    _applyVerticalCollisions();
     super.update(dt);
   }
 
@@ -97,6 +104,7 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _updatePlayerMovement(double dt) {
+    if(hasJumped && isOnGround) _playerJump(dt);
 
     velocity.x = horizontalMovement * moveSpeed;
     position.x += velocity.x * dt;
@@ -104,7 +112,7 @@ class Player extends SpriteAnimationGroupComponent
     //프레임 간섭에 의한 이동속도 차이가 사라지게 된다.
   }
 
-  void _checkHorizontalCollisions() {
+  void _applyHorizontalCollisions() {
     for(int i = 0 ; i < collisionBlocks.length; i++){
       final block = collisionBlocks[i];
       if(!block.isPlatform && checkCollision(this, block)){
@@ -114,10 +122,48 @@ class Player extends SpriteAnimationGroupComponent
         }
         if(velocity.x < 0){
           velocity.x = 0;
-          position.x = block.x +block.width;
+          position.x = block.x +block.width + width;
         }
       }
     }
+  }
+
+  void _applyGravity(double dt) {
+    velocity.y += _gravity;
+
+    velocity.y = velocity.y.clamp(-_jumpForce, _terminalVelocity); //위로가는 속도와 아래로 가는 속도의 한계를 셋팅함
+    position.y += velocity.y * dt;
+  }
+
+  void _applyVerticalCollisions() {
+    isOnGround = false;
+    for(int i = 0 ; i < collisionBlocks.length; i++){
+      final block = collisionBlocks[i];
+      if(block.isPlatform){
+
+      }else{
+        if(checkCollision(this, block)){
+          if(velocity.y > 0){
+            velocity.y = 0;
+            position.y = block.y - width;
+            isOnGround = true;
+            break;
+          }
+
+          if(velocity.y < 0){
+            velocity.y = 0;
+            position.y = block.y + block.height;
+          }
+        }
+      }
+    }
+  }
+
+  void _playerJump(double dt) {
+    velocity.y = -_jumpForce;
+    position.y += velocity.y * dt;
+    isOnGround = false;
+    hasJumped = false;
   }
 
 
