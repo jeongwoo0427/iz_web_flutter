@@ -1,5 +1,8 @@
 import 'package:flame/components.dart';
 import 'package:iz_web_flutter/adventure_game/adventure_game.dart';
+import 'package:iz_web_flutter/adventure_game/component/utils.dart';
+
+import 'collision_block.dart';
 
 enum PlayerState {
   idle,
@@ -14,7 +17,9 @@ class Player extends SpriteAnimationGroupComponent
   String character;
 
   Player({required this.character, required position})
-      : super(position: position);
+      : super(position: position){
+    debugMode = true;
+  }
 
   //Animation Variables
   late final SpriteAnimation _idleAnimation;
@@ -23,6 +28,9 @@ class Player extends SpriteAnimationGroupComponent
   double horizontalMovement = 0;
   double moveSpeed = 100;
   Vector2 velocity = Vector2.zero();
+
+  //Player객체는 직접 본인의 collision들을 알아야 한다.
+  List<CollisionBlock> collisionBlocks = [];
 
   @override
   Future<void> onLoad() async {
@@ -36,6 +44,7 @@ class Player extends SpriteAnimationGroupComponent
   void update(double dt) {
     _updatePlayerState();
     _updatePlayerMovement(dt);
+    _checkHorizontalCollisions();
     super.update(dt);
   }
 
@@ -93,6 +102,22 @@ class Player extends SpriteAnimationGroupComponent
     position.x += velocity.x * dt;
     //만약 프레임이 낮아지게 되면 프레임 간 dt가 커지게 되고 다음 position의 값은 커지게 되므로
     //프레임 간섭에 의한 이동속도 차이가 사라지게 된다.
+  }
+
+  void _checkHorizontalCollisions() {
+    for(int i = 0 ; i < collisionBlocks.length; i++){
+      final block = collisionBlocks[i];
+      if(!block.isPlatform && checkCollision(this, block)){
+        if(velocity.x > 0){
+          velocity.x = 0;
+          position.x = block.x - width;
+        }
+        if(velocity.x < 0){
+          velocity.x = 0;
+          position.x = block.x +block.width;
+        }
+      }
+    }
   }
 
 
