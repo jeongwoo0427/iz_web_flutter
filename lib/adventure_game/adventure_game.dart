@@ -33,7 +33,7 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
     //이미지를 사용하려면 앞으로 HasGameRef<PixelAdventure>를 mixin을 하여 game.images.fromCache('Main characters/Ninja Frog/Idle (32x32).png')
     //형식으로 이미지를 가져와 사용하도록 하자
     player = Player(character: 'Mask Dude', position: Vector2.zero());
-    level = Level(player: player, mapName: 'map1');
+    level = Level(player: player, levelName: 'map1');
     add(level);
 
     initJoystick();
@@ -93,14 +93,14 @@ class AdventureGame extends FlameGame with HasKeyboardHandlerComponents {
     //knob의 스프라이트 컴포넌트객체를 추가한다.
     final knobSprite = SpriteComponent(
       size: Vector2.all(30),
-      sprite: Sprite(images.fromCache('Images/HUD/knob.png')),
+      sprite: Sprite(images.fromCache('images/HUD/knob.png')),
     );
     //추가된 스프라이트 컴포넌트 객체의 색깔을 투명하게 조절한다.
     knobSprite.setColor(Colors.transparent.withOpacity(1 - knobOpacity));
 
     final backgroundSprite = SpriteComponent(
         size: Vector2.all(80),
-        sprite: Sprite(images.fromCache('Images/HUD/joystick.png')));
+        sprite: Sprite(images.fromCache('images/HUD/joystick.png')));
     backgroundSprite
         .setColor(Colors.transparent.withOpacity(1 - backgroundOpacity));
 

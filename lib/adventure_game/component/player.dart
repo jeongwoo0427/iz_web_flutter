@@ -1,87 +1,155 @@
+import 'dart:async';
+
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:iz_web_flutter/adventure_game/adventure_game.dart';
+import 'package:flame_audio/flame_audio.dart';
+import 'package:flutter/services.dart';
+import 'package:iz_web_flutter/adventure_game/component/saw.dart';
 import 'package:iz_web_flutter/adventure_game/component/utils.dart';
 
+import '../pixel_adventure.dart';
+import 'checkpoint.dart';
+import 'chicken.dart';
 import 'collision_block.dart';
+import 'custom_hitbox.dart';
+import 'fruit.dart';
 
 enum PlayerState {
   idle,
   running,
+  jumping,
+  falling,
+  hit,
+  appearing,
+  disappearing
 }
 
-
 class Player extends SpriteAnimationGroupComponent
-    with HasGameRef<AdventureGame>, KeyboardHandler {
-  // 최상위 수준의 게임클래스를 참조하기 위해 Mixin으로 선언
-
+    with HasGameRef<PixelAdventure>, KeyboardHandler, CollisionCallbacks {
   String character;
+  Player({
+    position,
+    this.character = 'Ninja Frog',
+  }) : super(position: position);
 
-  Player({required this.character, required position})
-      : super(position: position){
-    debugMode = false;
-  }
+  final double stepTime = 0.05;
+  late final SpriteAnimation idleAnimation;
+  late final SpriteAnimation runningAnimation;
+  late final SpriteAnimation jumpingAnimation;
+  late final SpriteAnimation fallingAnimation;
+  late final SpriteAnimation hitAnimation;
+  late final SpriteAnimation appearingAnimation;
+  late final SpriteAnimation disappearingAnimation;
 
-  //Animation Variables
-  late final SpriteAnimation _idleAnimation;
-  late final SpriteAnimation _runningAnimation;
-
-  double horizontalMovement = 0; //움직임 방향 -1 : 좌 , 1 : 우 , 0 : 정지
-  double moveSpeed = 100; //움직임 속도
+  final double _gravity = 9.8;
+  final double _jumpForce = 260;
+  final double _terminalVelocity = 300;
+  double horizontalMovement = 0;
+  double moveSpeed = 100;
+  Vector2 startingPosition = Vector2.zero();
   Vector2 velocity = Vector2.zero();
-  final double _gravity = 18.5;//중력
-  final double _jumpForce = 400;//점프력
-  final double _terminalVelocity = 400; //최대추락속도
   bool isOnGround = false;
   bool hasJumped = false;
-
-  //Player객체는 직접 본인의 collision들을 알아야 한다.
+  bool gotHit = false;
+  bool reachedCheckpoint = false;
   List<CollisionBlock> collisionBlocks = [];
+  CustomHitbox hitbox = CustomHitbox(
+    offsetX: 10,
+    offsetY: 4,
+    width: 14,
+    height: 28,
+  );
+  double fixedDeltaTime = 1 / 60;
+  double accumulatedTime = 0;
 
   @override
-  Future<void> onLoad() async {
+  FutureOr<void> onLoad() {
     _loadAllAnimations();
+    // debugMode = true;
+
+    startingPosition = Vector2(position.x, position.y);
+
+    add(RectangleHitbox(
+      position: Vector2(hitbox.offsetX, hitbox.offsetY),
+      size: Vector2(hitbox.width, hitbox.height),
+    ));
     return super.onLoad();
   }
 
-  //업데이트는 매 프레임마다 호출되며 컴퓨터의 프레임이 초당 10Fps일 경우 초당 10번 호출된다.
-  //dt : DeltaTime을 의미하며 프레임 사이의 속도를 나타낸다
   @override
   void update(double dt) {
-    _updatePlayerState();
-    _updatePlayerMovement(dt);
-    _applyHorizontalCollisions();
-    _applyGravity(dt);
-    _applyVerticalCollisions();
+    accumulatedTime += dt;
+
+    while (accumulatedTime >= fixedDeltaTime) {
+      if (!gotHit && !reachedCheckpoint) {
+        _updatePlayerState();
+        _updatePlayerMovement(fixedDeltaTime);
+        _checkHorizontalCollisions();
+        _applyGravity(fixedDeltaTime);
+        _checkVerticalCollisions();
+      }
+
+      accumulatedTime -= fixedDeltaTime;
+    }
+
     super.update(dt);
   }
 
+  @override
+  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    horizontalMovement = 0;
+    final isLeftKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyA) ||
+        keysPressed.contains(LogicalKeyboardKey.arrowLeft);
+    final isRightKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyD) ||
+        keysPressed.contains(LogicalKeyboardKey.arrowRight);
 
-  void _loadAllAnimations() {
-    _idleAnimation =
-        _loadAnimation(character: character, state: 'Idle', amount: 11);
-    //캐릭터로 쓸 스프라이트 이미지를 불러와 idleAnimation 변수에 저장한다.
+    horizontalMovement += isLeftKeyPressed ? -1 : 0;
+    horizontalMovement += isRightKeyPressed ? 1 : 0;
 
-    _runningAnimation =
-        _loadAnimation(character: character, state: 'Run', amount: 12);
+    hasJumped = keysPressed.contains(LogicalKeyboardKey.space);
 
-    animations = {
-      PlayerState.idle: _idleAnimation,
-      PlayerState.running: _runningAnimation
-    };
-    //상속받은 animations객체에 PlayerState와 애니메이션을 Map구조로 넣어둔다.
-
-    current = PlayerState.idle; //현재의 애니메이션 상태를 idle로 둠.
-    //current = PlayerState.running;
+    return super.onKeyEvent(event, keysPressed);
   }
 
-  SpriteAnimation _loadAnimation(
-      {required String character,
-        required String state,
-        required int amount,
-        double stepTime = 0.06}) {
+  @override
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (!reachedCheckpoint) {
+      if (other is Fruit) other.collidedWithPlayer();
+      if (other is Saw) _respawn();
+      if (other is Chicken) other.collidedWithPlayer();
+      if (other is Checkpoint) _reachedCheckpoint();
+    }
+    super.onCollisionStart(intersectionPoints, other);
+  }
+
+  void _loadAllAnimations() {
+    idleAnimation = _spriteAnimation('Idle', 11);
+    runningAnimation = _spriteAnimation('Run', 12);
+    jumpingAnimation = _spriteAnimation('Jump', 1);
+    fallingAnimation = _spriteAnimation('Fall', 1);
+    hitAnimation = _spriteAnimation('Hit', 7)..loop = false;
+    appearingAnimation = _specialSpriteAnimation('Appearing', 7);
+    disappearingAnimation = _specialSpriteAnimation('Desappearing', 7);
+
+    // List of all animations
+    animations = {
+      PlayerState.idle: idleAnimation,
+      PlayerState.running: runningAnimation,
+      PlayerState.jumping: jumpingAnimation,
+      PlayerState.falling: fallingAnimation,
+      PlayerState.hit: hitAnimation,
+      PlayerState.appearing: appearingAnimation,
+      PlayerState.disappearing: disappearingAnimation,
+    };
+
+    // Set current animation
+    current = PlayerState.idle;
+  }
+
+  SpriteAnimation _spriteAnimation(String state, int amount) {
     return SpriteAnimation.fromFrameData(
-      game.images
-          .fromCache('Images/Main Characters/${character}/${state} (32x32).png'),
+      game.images.fromCache('Main Characters/$character/$state (32x32).png'),
       SpriteAnimationData.sequenced(
         amount: amount,
         stepTime: stepTime,
@@ -90,39 +158,71 @@ class Player extends SpriteAnimationGroupComponent
     );
   }
 
+  SpriteAnimation _specialSpriteAnimation(String state, int amount) {
+    return SpriteAnimation.fromFrameData(
+      game.images.fromCache('Main Characters/$state (96x96).png'),
+      SpriteAnimationData.sequenced(
+        amount: amount,
+        stepTime: stepTime,
+        textureSize: Vector2.all(96),
+        loop: false,
+      ),
+    );
+  }
+
   void _updatePlayerState() {
     PlayerState playerState = PlayerState.idle;
 
-    if(velocity.x < 0 && scale.x > 0){
+    if (velocity.x < 0 && scale.x > 0) {
       flipHorizontallyAroundCenter();
-    }else if(velocity.x >0 && scale.x <0){
+    } else if (velocity.x > 0 && scale.x < 0) {
       flipHorizontallyAroundCenter();
     }
-    if(horizontalMovement==-1||horizontalMovement == 1) playerState = PlayerState.running;
+
+    // Check if moving, set running
+    if (velocity.x > 0 || velocity.x < 0) playerState = PlayerState.running;
+
+    // check if Falling set to falling
+    if (velocity.y > 0) playerState = PlayerState.falling;
+
+    // Checks if jumping, set to jumping
+    if (velocity.y < 0) playerState = PlayerState.jumping;
 
     current = playerState;
   }
 
   void _updatePlayerMovement(double dt) {
-    if(hasJumped && isOnGround) _playerJump(dt);
+    if (hasJumped && isOnGround) _playerJump(dt);
+
+    // if (velocity.y > _gravity) isOnGround = false; // optional
 
     velocity.x = horizontalMovement * moveSpeed;
     position.x += velocity.x * dt;
-    //만약 프레임이 낮아지게 되면 프레임 간 dt가 커지게 되고 다음 position의 값은 커지게 되므로
-    //프레임 간섭에 의한 이동속도 차이가 사라지게 된다.
   }
 
-  void _applyHorizontalCollisions() {
-    for(int i = 0 ; i < collisionBlocks.length; i++){
-      final block = collisionBlocks[i];
-      if(!block.isPlatform && checkCollision(this, block)){
-        if(velocity.x > 0){
-          velocity.x = 0;
-          position.x = block.x - width;
-        }
-        if(velocity.x < 0){
-          velocity.x = 0;
-          position.x = block.x +block.width + width;
+  void _playerJump(double dt) {
+
+    if (game.playSounds) FlameAudio.play('jump.wav', volume: game.soundVolume);
+    velocity.y = -_jumpForce;
+    position.y += velocity.y * dt;
+    isOnGround = false;
+    hasJumped = false;
+  }
+
+  void _checkHorizontalCollisions() {
+    for (final block in collisionBlocks) {
+      if (!block.isPlatform) {
+        if (checkCollision(this, block)) {
+          if (velocity.x > 0) {
+            velocity.x = 0;
+            position.x = block.x - hitbox.offsetX - hitbox.width;
+            break;
+          }
+          if (velocity.x < 0) {
+            velocity.x = 0;
+            position.x = block.x + block.width + hitbox.width + hitbox.offsetX;
+            break;
+          }
         }
       }
     }
@@ -130,46 +230,84 @@ class Player extends SpriteAnimationGroupComponent
 
   void _applyGravity(double dt) {
     velocity.y += _gravity;
-
-    velocity.y = velocity.y.clamp(-_jumpForce, _terminalVelocity); //위로가는 속도와 아래로 가는 속도의 한계를 셋팅함
+    velocity.y = velocity.y.clamp(-_jumpForce, _terminalVelocity);
     position.y += velocity.y * dt;
   }
 
-  void _applyVerticalCollisions() {
-    isOnGround = false;
-    for(int i = 0 ; i < collisionBlocks.length; i++){
-      final block = collisionBlocks[i];
-      if(block.isPlatform){//플래폼은 밑에서 위로 관통할 수 있어야 하므로 위에 닿을때의 액션은 제외됨.
-        if(checkCollision(this, block)){//바닥에 닿았을 경우 더이상 하강하지 못하도록
-          velocity.y = 0;
-          position.y = block.y - width;
-          isOnGround = true;
-          break;
-        }
-      }else{
-        if(checkCollision(this, block)){
-          if(velocity.y > 0){//바닥에 닿았을 경우 더이상 하강하지 못하도록
+  void _checkVerticalCollisions() {
+    for (final block in collisionBlocks) {
+      if (block.isPlatform) {
+        if (checkCollision(this, block)) {
+          if (velocity.y > 0) {
             velocity.y = 0;
-            position.y = block.y - width;
+            position.y = block.y - hitbox.height - hitbox.offsetY;
             isOnGround = true;
             break;
           }
-
-          if(velocity.y < 0){//천장에 닿았을 경우 더이상 승강하지 못하도록
+        }
+      } else {
+        if (checkCollision(this, block)) {
+          if (velocity.y > 0) {
             velocity.y = 0;
-            position.y = block.y + block.height;
+            position.y = block.y - hitbox.height - hitbox.offsetY;
+            isOnGround = true;
+            break;
+          }
+          if (velocity.y < 0) {
+            velocity.y = 0;
+            position.y = block.y + block.height - hitbox.offsetY;
           }
         }
       }
     }
   }
 
-  void _playerJump(double dt) {
-    velocity.y = -_jumpForce;
-    position.y += velocity.y * dt;
-    isOnGround = false;
-    hasJumped = false;
+  void _respawn() async {
+    if (game.playSounds) FlameAudio.play('hit.wav', volume: game.soundVolume);
+    const canMoveDuration = Duration(milliseconds: 400);
+    gotHit = true;
+    current = PlayerState.hit;
+
+    await animationTicker?.completed;
+    animationTicker?.reset();
+
+    scale.x = 1;
+    position = startingPosition - Vector2.all(32);
+    current = PlayerState.appearing;
+
+    await animationTicker?.completed;
+    animationTicker?.reset();
+
+    velocity = Vector2.zero();
+    position = startingPosition;
+    _updatePlayerState();
+    Future.delayed(canMoveDuration, () => gotHit = false);
   }
 
+  void _reachedCheckpoint() async {
+    reachedCheckpoint = true;
+    if (game.playSounds) {
+      FlameAudio.play('disappear.wav', volume: game.soundVolume);
+    }
+    if (scale.x > 0) {
+      position = position - Vector2.all(32);
+    } else if (scale.x < 0) {
+      position = position + Vector2(32, -32);
+    }
 
+    current = PlayerState.disappearing;
+
+    await animationTicker?.completed;
+    animationTicker?.reset();
+
+    reachedCheckpoint = false;
+    position = Vector2.all(-640);
+
+    const waitToChangeDuration = Duration(seconds: 3);
+    Future.delayed(waitToChangeDuration, () => game.loadNextLevel());
+  }
+
+  void collidedwithEnemy() {
+    _respawn();
+  }
 }

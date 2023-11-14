@@ -1,26 +1,22 @@
-import 'package:iz_web_flutter/adventure_game/component/collision_block.dart';
-import 'package:iz_web_flutter/adventure_game/component/player.dart';
-
-bool checkCollision(Player player, CollisionBlock block) {
-  final playerX = player.position.x;
-  final playerY = player.position.y;
-  final playerWidth = player.width;
-  final playerHeight = player.height;
+bool checkCollision(player, block) {
+  final hitbox = player.hitbox;
+  final playerX = player.position.x + hitbox.offsetX;
+  final playerY = player.position.y + hitbox.offsetY;
+  final playerWidth = hitbox.width;
+  final playerHeight = hitbox.height;
 
   final blockX = block.x;
   final blockY = block.y;
   final blockWidth = block.width;
   final blockHeight = block.height;
 
-  //플레이어가 왼쪽으로 이동할땐 좌,우 가 뒤집히기 때문에 그에 대한 대처를 함.
-  final fixedX = player.scale.x < 0 ? playerX - playerWidth : playerX;
-
-  //점프를 할 경우 플랫폼에 닿았을때에 대한 대처를 함.
+  final fixedX = player.scale.x < 0
+      ? playerX - (hitbox.offsetX * 2) - playerWidth
+      : playerX;
   final fixedY = block.isPlatform ? playerY + playerHeight : playerY;
 
-  return (fixedY < block.y + blockHeight &&
-      fixedY + playerHeight > blockY &&
+  return (fixedY < blockY + blockHeight &&
+      playerY + playerHeight > blockY &&
       fixedX < blockX + blockWidth &&
-      fixedX + playerWidth > blockX
-  );
+      fixedX + playerWidth > blockX);
 }

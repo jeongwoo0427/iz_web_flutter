@@ -1,73 +1,135 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:iz_web_flutter/adventure_game/component/collision_block.dart';
 
+import '../pixel_adventure.dart';
+import 'background_tile.dart';
+import 'checkpoint.dart';
+import 'chicken.dart';
+import 'collision_block.dart';
+import 'fruit.dart';
 import 'player.dart';
-import '../adventure_game.dart';
+import 'saw.dart';
 
-class Level extends World {
-  final String mapName;
+class Level extends World with HasGameRef<PixelAdventure> {
+  final String levelName;
   final Player player;
-
-  Level({required this.mapName, required this.player});
-
-  late final TiledComponent level;
-  final List<CollisionBlock> collisionBlocks = [];
+  Level({required this.levelName, required this.player});
+  late TiledComponent level;
+  List<CollisionBlock> collisionBlocks = [];
 
   @override
-  Future<void> onLoad() async {
-    level = await TiledComponent.load(
-        '${mapName}.tmx', prefix: AdventureGame.assetPrefix, Vector2.all(16));
+  FutureOr<void> onLoad() async {
+    level = await TiledComponent.load('$levelName.tmx',prefix: '${PixelAdventure.assetPrefix}tiles/', Vector2.all(16));
+
     add(level);
 
-    final spawnPointsLayer = level.tileMap.getLayer<ObjectGroup>('spawnpoints');
-    //spawnpoints 라는 레이어를 가져온다
+    _scrollingBackground();
+    _spawningObjects();
+    _addCollisions();
 
-    //spawnpoints 레이어의 모든 객체들을 가져온다.
+    return super.onLoad();
+  }
+
+
+  void _scrollingBackground() {
+    final backgroundLayer = level.tileMap.getLayer('Background');
+
+    if (backgroundLayer != null) {
+      final backgroundColor =
+      backgroundLayer.properties.getValue('BackgroundColor');
+      final backgroundTile = BackgroundTile(
+        color: backgroundColor ?? 'Gray',
+        position: Vector2(0, 0),
+      );
+      add(backgroundTile);
+    }
+  }
+
+
+
+  void _spawningObjects() {
+    final spawnPointsLayer = level.tileMap.getLayer<ObjectGroup>('Spawnpoints');
+
     if (spawnPointsLayer != null) {
-      for (int i = 0; i < (spawnPointsLayer.objects.length); i++) {
-        final spawnPoint = spawnPointsLayer.objects[i];
+      for (final spawnPoint in spawnPointsLayer.objects) {
         switch (spawnPoint.class_) {
-          case 'player': //클래스이름을 기준으로 switch 분기
+          case 'Player':
             player.position = Vector2(spawnPoint.x, spawnPoint.y);
-            //플레이어의 부모클래스로부터 상속받은 position 객체에 현재 spawnPoint 객체의 x,y 좌표를 넣음
+            player.scale.x = 1;
             add(player);
             break;
-
+          case 'Fruit':
+            final fruit = Fruit(
+              fruit: spawnPoint.name,
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+            );
+            add(fruit);
+            break;
+          case 'Saw':
+            final isVertical = spawnPoint.properties.getValue('isVertical');
+            final offNeg = spawnPoint.properties.getValue('offNeg');
+            final offPos = spawnPoint.properties.getValue('offPos');
+            final saw = Saw(
+              isVertical: isVertical,
+              offNeg: offNeg,
+              offPos: offPos,
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+            );
+            add(saw);
+            break;
+          case 'Checkpoint':
+            final checkpoint = Checkpoint(
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+            );
+            add(checkpoint);
+            break;
+          case 'Chicken':
+            final offNeg = spawnPoint.properties.getValue('offNeg');
+            final offPos = spawnPoint.properties.getValue('offPos');
+            final chicken = Chicken(
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+              offNeg: offNeg,
+              offPos: offPos,
+            );
+            add(chicken);
+            break;
           default:
         }
       }
     }
+  }
 
-    //collisions 레이어를 가져온다.
-    final collisionsLayer = level.tileMap.getLayer<ObjectGroup>('collisions');
+  void _addCollisions() {
+    final collisionsLayer = level.tileMap.getLayer<ObjectGroup>('Collisions');
+
     if (collisionsLayer != null) {
-      for (int i = 0; i < (collisionsLayer.objects.length); i++) {
-        print(i);
-        final collision = collisionsLayer.objects[i];
+      for (final collision in collisionsLayer.objects) {
         switch (collision.class_) {
-          case 'platform': //클래스이름을 기준으로 switch 분기
+          case 'Platform':
             final platform = CollisionBlock(
-                position: Vector2(collision.x, collision.y),
-                size: Vector2(collision.width, collision.height),
-                isPlatform: true);
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              isPlatform: true,
+            );
             collisionBlocks.add(platform);
             add(platform);
             break;
-
           default:
             final block = CollisionBlock(
-              position: Vector2(collision.x,collision.y),
-              size:  Vector2(collision.width,collision.height),
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
             );
             collisionBlocks.add(block);
             add(block);
         }
       }
     }
-
     player.collisionBlocks = collisionBlocks;
-
-    return super.onLoad();
   }
 }

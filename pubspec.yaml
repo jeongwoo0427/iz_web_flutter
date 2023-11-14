@@ -39,6 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flame: ^1.10.0
   flame_tiled: ^1.15.0
+  flame_audio: ^2.1.3
   responsive_framework: ^0.2.0
   go_router: ^9.0.0
 
@@ -71,13 +72,21 @@ flutter:
     - assets/image/badge/
     - assets/image/portfolio/
     - assets/json/
-    - assets/game/adventure/
-    - assets/game/adventure/Images/Terrain/
-    - assets/game/adventure/Images/Main Characters/Mask Dude/
-    - assets/game/adventure/Images/Main Characters/Ninja Frog/
-    - assets/game/adventure/Images/Main Characters/Pink Man/
-    - assets/game/adventure/Images/Main Characters/Virtual Guy/
-    - assets/game/adventure/Images/HUD/
+
+    - assets/game/adventure/audio/
+    - assets/game/adventure/tiles/
+    - assets/game/adventure/images/Background/
+    - assets/game/adventure/images/Terrain/
+    - assets/game/adventure/images/HUD/
+    - assets/game/adventure/images/Traps/Saw/
+    - assets/game/adventure/images/Items/Checkpoints/Checkpoint/
+    - assets/game/adventure/images/Items/Fruits/
+    - assets/game/adventure/images/Main Characters/
+    - assets/game/adventure/images/Main Characters/Mask Dude/
+    - assets/game/adventure/images/Main Characters/Ninja Frog/
+    - assets/game/adventure/images/Main Characters/Pink Man/
+    - assets/game/adventure/images/Main Characters/Virtual Guy/
+    - assets/game/adventure/images/Enemies/Chicken/
 
 
 
