@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iz_web_flutter/constant/app_constants.dart';
 import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
 
 import '../../widget/navigation_widget.dart';
@@ -15,7 +16,7 @@ class _SplatBannerMakerScreenState extends State<SplatBannerMakerScreen> {
   @override
   Widget build(BuildContext context) {
     return WebResponsiveScaffold(
-      navigationWidget: NavigationWidget(showBackColor: true,),
+      navigationWidget: NavigationWidget(menuCode: MenuCodes.BANNERMAKER,showBackColor: true,),
       body: ReceiptPage(),
     );
   }

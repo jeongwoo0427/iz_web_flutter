@@ -5,3 +5,10 @@ const double globalHorizonPadding25 = 25;
 
 const EdgeInsets globalListPadding = const EdgeInsets.only(top: 20,bottom: 60,left: globalHorizonPadding15,right: globalHorizonPadding15);
 
+
+class MenuCodes{
+  static const String BANNERMAKER = 'SPLTBM';
+  static const String GAME = 'GAME';
+  static const String CHAT = 'CHAT';
+  static const String TEST = 'TEST';
+}

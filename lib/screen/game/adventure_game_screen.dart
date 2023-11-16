@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:iz_web_flutter/adventure_game/pixel_adventure.dart';
+import 'package:iz_web_flutter/constant/app_constants.dart';
 import 'package:iz_web_flutter/widget/navigation_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
 
@@ -16,7 +17,7 @@ class _BombGameScreenState extends State<BombGameScreen> {
   @override
   Widget build(BuildContext context) {
     return WebResponsiveScaffold(
-      navigationWidget: NavigationWidget(showBackColor: true ),
+      navigationWidget: NavigationWidget(menuCode: MenuCodes.GAME,showBackColor: true ),
       body: Column(
         children: [
           SizedBox(height: 50,),
