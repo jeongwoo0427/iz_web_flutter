@@ -8,6 +8,7 @@ import 'package:iz_web_flutter/core/model/chat/message_model.dart';
 import 'package:iz_web_flutter/core/model/chat/user_model.dart';
 import 'package:iz_web_flutter/core/service/api/data/chat_message_data.dart';
 import 'package:iz_web_flutter/core/state/socket_state.dart';
+import 'package:iz_web_flutter/screen/chat/user_setting_dialog.dart';
 import 'package:iz_web_flutter/widget/dialog/card_button_dialog.dart';
 import 'package:iz_web_flutter/widget/input/rounded_textfield_widget.dart';
 import 'package:iz_web_flutter/widget/navigation_widget.dart';
@@ -45,19 +46,19 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
     isMessageFutureFetched = _fetchData();
   }
 
-
   Future<bool> _fetchData() async {
-    try{
+    try {
       await _fetchUser();
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(Duration(milliseconds: 200));
 
-      List<MessageModel> messages = await ChatMessageData().getMessages(roomCode: roomCode);
+      List<MessageModel> messages =
+          await ChatMessageData().getMessages(roomCode: roomCode);
 
       _messages = messages;
 
       _initSocket();
       return true;
-    }catch(err,stack){
+    } catch (err, stack) {
       handlingErrorDialog(context, err, stack);
       throw err;
     }
@@ -67,68 +68,30 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
     await Future.delayed(Duration(milliseconds: 1));
 
     String? userID = await PreferenceHelper().getUserID();
-    String? userName = await PreferenceHelper().getUserName();
-
     if (userID == null) {
-      await PreferenceHelper().setUserID(_uuid.v4());
+      userID = _uuid.v4();
+      await PreferenceHelper().setUserID(userID);
     }
 
+    String? userName = await PreferenceHelper().getUserName();
     if (userName == null) {
-      final result = await _showUserSettingDialog();
+      final result = await _showUserSettingDialog(userId: userID);
       if (result != true) return;
     }
 
     userID = await PreferenceHelper().getUserID();
     userName = await PreferenceHelper().getUserName();
+
     userInfo = UserModel(userId: userID!, userName: userName!);
-
-
   }
 
-  Future<bool> _showUserSettingDialog() async {
-    final TextEditingController controller = TextEditingController();
-
+  Future<bool> _showUserSettingDialog({required String userId}) async {
     final result = await showDialog(
         context: context,
-        builder: (context) => CardButtonDialog(
-              width: 400,
-              child: Column(
-                children: [
-                  Text(
-                    '프로필 설정',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      children: [
-                        Expanded(flex: 1, child: Text('닉네임')),
-                        Expanded(
-                            flex: 6,
-                            child: RoundedTextFieldWidget(
-                              controller: controller,
-                              maxLength: 10,
-                            ))
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
-              ),
-              onTapConfirm: () {
-                Navigator.pop(context, true);
-              },
-              confirmText: '저장',
-            ));
+        builder: (context) => UserSettingDialog(userId: userId,));
 
     if (result != true) return false;
 
-    await PreferenceHelper().setUserName(controller.text);
     return true;
   }
 
@@ -163,7 +126,6 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
         _messages.insert(0, message);
       });
     });
-    _socket.on('fromServer', (_) => print(_));
     _socket.on('error', (data) => print(data));
     _socket.on('hey', (data) => print('hey ${data}'));
     _socket.onDisconnect((_) => print('disconnect'));
@@ -202,18 +164,19 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
               children: [
                 Expanded(
                     child: FutureBuilder<bool>(
-                      future: isMessageFutureFetched,
-                      builder: (context,snapshot){
-                      if (snapshot.connectionState != ConnectionState.done) {
-                        return buildLoader();
-                      }
-                      if (snapshot.hasError) {
-                        return buildError();
-                      } else if (snapshot.hasData) {
-                        return buildSuccess(_messages);
-                      }
-                      return buildNoData();
-                    },)),
+                  future: isMessageFutureFetched,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return buildLoader();
+                    }
+                    if (snapshot.hasError) {
+                      return buildError();
+                    } else if (snapshot.hasData) {
+                      return buildSuccess(_messages);
+                    }
+                    return buildNoData();
+                  },
+                )),
                 Container(
                   height: 80,
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -280,17 +243,15 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
     return ListView.separated(
         reverse: true,
         key: _listKey,
-        padding:
-        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         itemCount: _messages.length,
         separatorBuilder: (_, __) => SizedBox(
-          height: ResponsiveValue<double>(context,
-              defaultValue: 18,
-              valueWhen: [
-                Condition.smallerThan(
-                    name: TABLET, value: 10)
-              ]).value,
-        ),
+              height: ResponsiveValue<double>(context,
+                  defaultValue: 18,
+                  valueWhen: [
+                    Condition.smallerThan(name: TABLET, value: 10)
+                  ]).value,
+            ),
         itemBuilder: (context, index) {
           return buildItem(context, index);
         });
@@ -379,7 +340,4 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
     });
     _messageFocus.requestFocus();
   }
-
-
-
 }
