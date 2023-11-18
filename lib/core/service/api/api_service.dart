@@ -71,7 +71,7 @@ class APIService {
         }
       }
 
-      throw '오류 : [${err.error.toString()}]';
+      throw Exception('통신오류가 발생했습니다. [${err.type}] [${err.message}] [${err.response}]');
     } catch (ex) {
       log('API_Service error) unknown error occurred');
       throw ex;

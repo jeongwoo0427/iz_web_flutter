@@ -5,16 +5,18 @@ class MessageModel {
   static const String CN_roomCode = 'roomCode';
   static const String CN_type = 'type';
   static const String CN_content = 'content';
-  static const String CN_userInfo = 'userInfo';
+  static const String CN_userId = 'userId';
+  static const String CN_userName = 'userName';
 
   final String uuid;
   final String roomCode;
   final String type;
   final String content;
-  final UserModel userInfo;
+  final String userId;
+  final String userName;
 
   MessageModel(
-      {required this.uuid, required this.roomCode,required this.type, required this.content, required this.userInfo});
+      {required this.uuid, required this.roomCode,required this.type, required this.content, required this.userId, required this.userName});
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
@@ -22,7 +24,9 @@ class MessageModel {
         roomCode: map[CN_roomCode]??'',
         type: map[CN_type]??'',
         content: map[CN_content] ?? 'unknown_content',
-        userInfo: UserModel.fromMap(map[CN_userInfo]));
+        userId: map[CN_userId] ?? '',
+        userName: map[CN_userName] ??''
+    );
   }
 
   Map<String,dynamic> toMap() {
@@ -31,7 +35,9 @@ class MessageModel {
     map[CN_roomCode] = this.roomCode;
     map[CN_type] = this.type;
     map[CN_content] = this.content;
-    map[CN_userInfo] = this.userInfo.toMap();
+    map[CN_userId] = this.userId;
+    map[CN_userName] = this.userName;
+
     return map;
   }
 }

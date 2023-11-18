@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import '../model/error/http_failure.dart';
 
@@ -109,27 +110,19 @@ mixin DialogMixin {
 
 
   Future<dynamic> handlingErrorDialog(BuildContext context, err, stack) async{
-    if(err is HttpFailure){
+    if (err is HttpFailure) {
       HttpFailure failure = err;
-      log('error)${failure.message}',stackTrace: StackTrace.current,error: err);
+      Logger().e('error)${failure.message}', error: err, stackTrace: stack);
 
-      ///401은 오류메시지만 표시
-      ///419는 오류메시지 표시 및 선택적 재로그인
-
-      if(failure.code == 401){
-        await showAlertDialog(context, title: '인증오류', content: failure.message);
-      }else if(failure.code == 419){
-        //Provider.of<AuthState>(context,listen: false).signOut();
-        //await showLoginDialog(context,customMessage: failure.message);
-      }else{
-        await showAlertDialog(context, title: '오류', content: failure.message,positiveText: '확인');
-      }
-    }else if(err is String){
-      log('error)${err}',stackTrace: stack,error: err);
-      await showAlertDialog(context, title: '오류', content: err.toString(),positiveText: '확인');
-    }else {
-      log('error) unknown error has occurred',stackTrace: stack,error: err);
-      await showAlertDialog(context, title: '오류', content: '오류가 발생했습니다.',positiveText: '확인');
+    } else if (err is String) {
+      Logger().e('DialogMixin_StringType)${err}', stackTrace: stack, error: err);
+      await showAlertDialog(context, title: '메시지형 오류', content: err, positiveText: '확인');
+    } else if (err is Exception) {
+      Logger().e('DialogMixin_ExceptionType) error has occurred', stackTrace: stack, error: err);
+      await showAlertDialog(context, title: '예외적 오류', content: err.toString(), positiveText: '확인');
+    } else {
+      Logger().e('DialogMixin_UnkownType) uncaught error has occurred', stackTrace: stack, error: err);
+      await showAlertDialog(context, title: '전역오류', content: '알 수 없는 오류가 발생했습니다.', positiveText: '확인');
     }
   }
 

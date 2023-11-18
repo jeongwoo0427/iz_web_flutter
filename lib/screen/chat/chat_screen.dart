@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:iz_web_flutter/constant/app_constants.dart';
 import 'package:iz_web_flutter/core/cache/preference_helper.dart';
 import 'package:iz_web_flutter/core/mixin/dialog_mixin.dart';
+import 'package:iz_web_flutter/core/mixin/future_mixin.dart';
 import 'package:iz_web_flutter/core/model/chat/message_model.dart';
 import 'package:iz_web_flutter/core/model/chat/user_model.dart';
+import 'package:iz_web_flutter/core/service/api/data/chat_message_data.dart';
 import 'package:iz_web_flutter/core/state/socket_state.dart';
 import 'package:iz_web_flutter/widget/dialog/card_button_dialog.dart';
 import 'package:iz_web_flutter/widget/input/rounded_textfield_widget.dart';
@@ -21,7 +23,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with DialogMixin {
+class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
   final IO.Socket _socket = SocketState().socket;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocus = FocusNode();
@@ -29,7 +31,8 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
 
   final String roomCode = 'code1234';
   final _uuid = Uuid();
-  final List<MessageModel> _messages = [];
+  List<MessageModel> _messages = [];
+  late Future<bool> isMessageFutureFetched;
 
   UserModel userInfo =
       UserModel(userId: 'unknown_user', userName: 'Unknown User');
@@ -38,16 +41,35 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
   void initState() {
     //print('initState');
     super.initState();
-    _fetch();
+
+    isMessageFutureFetched = _fetchData();
   }
 
-  Future<void> _fetch() async {
+
+  Future<bool> _fetchData() async {
+    try{
+      await _fetchUser();
+      await Future.delayed(Duration(milliseconds: 500));
+
+      List<MessageModel> messages = await ChatMessageData().getMessages(roomCode: roomCode);
+
+      _messages = messages;
+
+      _initSocket();
+      return true;
+    }catch(err,stack){
+      handlingErrorDialog(context, err, stack);
+      throw err;
+    }
+  }
+
+  Future<void> _fetchUser() async {
     await Future.delayed(Duration(milliseconds: 1));
 
     String? userID = await PreferenceHelper().getUserID();
     String? userName = await PreferenceHelper().getUserName();
 
-    if(userID == null){
+    if (userID == null) {
       await PreferenceHelper().setUserID(_uuid.v4());
     }
 
@@ -58,10 +80,9 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
 
     userID = await PreferenceHelper().getUserID();
     userName = await PreferenceHelper().getUserName();
-    userInfo =
-        UserModel(userId: userID!, userName: userName!);
+    userInfo = UserModel(userId: userID!, userName: userName!);
 
-    _initSocket();
+
   }
 
   Future<bool> _showUserSettingDialog() async {
@@ -127,7 +148,8 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
             roomCode: roomCode,
             type: ChatMessageTypes.ALRT,
             content: '${user.userName}님이 등장하셨습니다.',
-            userInfo: userInfo);
+            userId: userInfo.userId,
+            userName: userInfo.userName);
         _socket.emit('sendMessage', [messageModel.toMap()]);
       }
     });
@@ -179,23 +201,19 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
             child: Column(
               children: [
                 Expanded(
-                    child: ListView.separated(
-                        reverse: true,
-                        key: _listKey,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                        itemCount: _messages.length,
-                        separatorBuilder: (_, __) => SizedBox(
-                              height: ResponsiveValue<double>(context,
-                                  defaultValue: 18,
-                                  valueWhen: [
-                                    Condition.smallerThan(
-                                        name: TABLET, value: 10)
-                                  ]).value,
-                            ),
-                        itemBuilder: (context, index) {
-                          return buildItem(context, index);
-                        })),
+                    child: FutureBuilder<bool>(
+                      future: isMessageFutureFetched,
+                      builder: (context,snapshot){
+                      if (snapshot.connectionState != ConnectionState.done) {
+                        return buildLoader();
+                      }
+                      if (snapshot.hasError) {
+                        return buildError();
+                      } else if (snapshot.hasData) {
+                        return buildSuccess(_messages);
+                      }
+                      return buildNoData();
+                    },)),
                 Container(
                   height: 80,
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -257,6 +275,27 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
     );
   }
 
+  @override
+  Widget buildSuccess(data) {
+    return ListView.separated(
+        reverse: true,
+        key: _listKey,
+        padding:
+        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        itemCount: _messages.length,
+        separatorBuilder: (_, __) => SizedBox(
+          height: ResponsiveValue<double>(context,
+              defaultValue: 18,
+              valueWhen: [
+                Condition.smallerThan(
+                    name: TABLET, value: 10)
+              ]).value,
+        ),
+        itemBuilder: (context, index) {
+          return buildItem(context, index);
+        });
+  }
+
   Widget buildItem(BuildContext context, int index) {
     final Size screenSize = MediaQuery.of(context).size;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -276,37 +315,49 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
 
     return Row(
       mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: message.userInfo.userId == userInfo.userId? MainAxisAlignment.end: MainAxisAlignment.start,
+      mainAxisAlignment: message.userId == userInfo.userId
+          ? MainAxisAlignment.end
+          : MainAxisAlignment.start,
       children: [
         Column(
-            crossAxisAlignment:message.userInfo.userId == userInfo.userId?  CrossAxisAlignment.end : CrossAxisAlignment.start,
+            crossAxisAlignment: message.userId == userInfo.userId
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
             children: [
-          if(message.userInfo.userId != userInfo.userId)Text(message.userInfo.userName,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w300),),
-          SizedBox(height: 5,),
-          Container(
-            constraints: BoxConstraints(
-              minWidth: 40,
-              maxWidth: ResponsiveValue<double>(context,
-                  defaultValue: 700,
-                  valueWhen: [
-                    Condition.smallerThan(
-                        name: TABLET, value: screenSize.width * 0.7)
-                  ]).value!,
-            ),
-            child: Column(
-              children: [
+              if (message.userId != userInfo.userId)
                 Text(
-                  message.content,
-                  style: TextStyle(fontWeight: FontWeight.w300),
-                )
-              ],
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: message.userInfo.userId == userInfo.userId?colorScheme.primary.withOpacity(0.5):colorScheme.onSurface.withOpacity(0.1)),
-          ),
-        ]),
+                  message.userName,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+                ),
+              SizedBox(
+                height: 5,
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  minWidth: 40,
+                  maxWidth: ResponsiveValue<double>(context,
+                      defaultValue: 700,
+                      valueWhen: [
+                        Condition.smallerThan(
+                            name: TABLET, value: screenSize.width * 0.7)
+                      ]).value!,
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      message.content,
+                      style: TextStyle(fontWeight: FontWeight.w300),
+                    )
+                  ],
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: message.userId == userInfo.userId
+                        ? colorScheme.primary.withOpacity(0.5)
+                        : colorScheme.onSurface.withOpacity(0.1)),
+              ),
+            ]),
       ],
     );
   }
@@ -319,7 +370,8 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
         roomCode: roomCode,
         type: ChatMessageTypes.MSG,
         content: _messageController.text,
-        userInfo: userInfo);
+        userId: userInfo.userId,
+        userName: userInfo.userName);
 
     _socket.emit('sendMessage', [messageModel.toMap()]);
     setState(() {
@@ -327,4 +379,7 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin {
     });
     _messageFocus.requestFocus();
   }
+
+
+
 }
