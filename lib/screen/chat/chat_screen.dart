@@ -21,7 +21,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final IO.Socket _socket = SocketState().socket;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocus = FocusNode();
-  final ScrollController _scrollController = ScrollController();
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   final String roomCode = 'code1234';
   final UserModel userInfo = UserModel(userId: 'kjw902', userName: '크크리');
@@ -40,13 +40,31 @@ class _ChatScreenState extends State<ChatScreen> {
       {"roomCode": roomCode, "userInfo": userInfo.toMap()}
     ]);
 
+
+
+    _socket.on('roomJoined',(data){
+      if (!this.mounted) return;
+
+      final String socketId = data['socketId'];
+      final UserModel user = UserModel.fromMap(data['userInfo']);
+      if(_socket.id == socketId){
+        final MessageModel messageModel = MessageModel(
+            uuid: _uuid.v4(),
+            roomCode: roomCode,
+            type: ChatMessageTypes.ALRT,
+            content: '${user.userName}님이 등장하셨습니다.',
+            userInfo: userInfo);
+        _socket.emit('sendMessage', [messageModel.toMap()]);
+      }
+    });
+
     _socket.on('messageReceived', (data) {
       if (!this.mounted) return;
 
       MessageModel message = MessageModel.fromMap(data);
       print(data);
       setState(() {
-        _messages.add(message);
+        _messages.insert(0, message);
       });
     });
     _socket.on('fromServer', (_) => print(_));
@@ -88,7 +106,8 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                     child: ListView.separated(
-                      controller: _scrollController,
+                        reverse: true,
+                        key: _listKey,
                         padding:
                             EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                         itemCount: _messages.length,
@@ -97,38 +116,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                   defaultValue: 18,
                                   valueWhen: [
                                     Condition.smallerThan(
-                                        name: TABLET,
-                                        value: 10)
+                                        name: TABLET, value: 10)
                                   ]).value,
                             ),
                         itemBuilder: (context, index) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 40,
-                                  maxWidth: ResponsiveValue<double>(context,
-                                      defaultValue: 700,
-                                      valueWhen: [
-                                        Condition.smallerThan(
-                                            name: TABLET,
-                                            value: screenSize.width * 0.7)
-                                      ]).value!,
-                                ),
-                                child: Text(
-                                  _messages[index].content,
-                                  style: TextStyle(fontWeight: FontWeight.w300),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                    color:
-                                        colorScheme.onSurface.withOpacity(0.1)),
-                              ),
-                            ],
-                          );
+                          return buildItem(context, index);
                         })),
                 Container(
                   height: 80,
@@ -144,15 +136,18 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: RawKeyboardListener(
                               autofocus: true,
                               focusNode: FocusNode(),
-                              onKey:(event){
+                              onKey: (event) {
                                 // print(event);
-                                if(event.isKeyPressed(LogicalKeyboardKey.enter)){ // just keyDown
+                                if (event
+                                    .isKeyPressed(LogicalKeyboardKey.enter)) {
+                                  // just keyDown
                                   _sendMessage();
                                 }
                               },
                               child: TextFormField(
                                 focusNode: _messageFocus,
-                                textInputAction: TextInputAction.none, //이걸 해줘야 엔터 입력에도 포커스가 나가지 않음
+                                textInputAction: TextInputAction.none,
+                                //이걸 해줘야 엔터 입력에도 포커스가 나가지 않음
                                 controller: _messageController,
                                 cursorColor: Colors.black,
                                 decoration: InputDecoration(
@@ -162,7 +157,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     errorBorder: InputBorder.none,
                                     disabledBorder: InputBorder.none,
                                     contentPadding: EdgeInsets.only(
-                                        left: 15, bottom: 11, top: 11, right: 3),
+                                        left: 15,
+                                        bottom: 11,
+                                        top: 11,
+                                        right: 3),
                                     hintText: "여기에 메시지를 입력하세요."),
                               ),
                             ),
@@ -185,12 +183,54 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget buildItem(BuildContext context, int index) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final MessageModel message = _messages[index];
+
+    if (_messages[index].type == ChatMessageTypes.ALRT) {
+      return Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: Text(message.content),
+          )
+        ],
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Container(
+          constraints: BoxConstraints(
+            minWidth: 40,
+            maxWidth:
+                ResponsiveValue<double>(context, defaultValue: 700, valueWhen: [
+              Condition.smallerThan(name: TABLET, value: screenSize.width * 0.7)
+            ]).value!,
+          ),
+          child: Text(
+           message.content,
+            style: TextStyle(fontWeight: FontWeight.w300),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: colorScheme.onSurface.withOpacity(0.1)),
+        ),
+      ],
+    );
+  }
+
   void _sendMessage() {
-    if(_messageController.text.length ==0) return;
+    if (_messageController.text.length == 0) return;
 
     final MessageModel messageModel = MessageModel(
         uuid: _uuid.v4(),
         roomCode: roomCode,
+        type: ChatMessageTypes.MSG,
         content: _messageController.text,
         userInfo: userInfo);
 

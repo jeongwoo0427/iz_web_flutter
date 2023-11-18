@@ -12,3 +12,9 @@ class MenuCodes{
   static const String CHAT = 'CHAT';
   static const String TEST = 'TEST';
 }
+
+
+class ChatMessageTypes{
+  static const String MSG = 'MESSAGE';
+  static const String ALRT = 'ALRT';
+}
