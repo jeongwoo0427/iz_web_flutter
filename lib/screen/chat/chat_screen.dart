@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iz_web_flutter/constant/app_constants.dart';
+import 'package:iz_web_flutter/core/cache/preference_helper.dart';
+import 'package:iz_web_flutter/core/mixin/dialog_mixin.dart';
 import 'package:iz_web_flutter/core/model/chat/message_model.dart';
 import 'package:iz_web_flutter/core/model/chat/user_model.dart';
 import 'package:iz_web_flutter/core/state/socket_state.dart';
+import 'package:iz_web_flutter/widget/dialog/card_button_dialog.dart';
+import 'package:iz_web_flutter/widget/input/rounded_textfield_widget.dart';
 import 'package:iz_web_flutter/widget/navigation_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -17,22 +21,94 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with DialogMixin {
   final IO.Socket _socket = SocketState().socket;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocus = FocusNode();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   final String roomCode = 'code1234';
-  final UserModel userInfo = UserModel(userId: 'kjw902', userName: '크크리');
   final _uuid = Uuid();
   final List<MessageModel> _messages = [];
+
+  UserModel userInfo =
+      UserModel(userId: 'unknown_user', userName: 'Unknown User');
 
   @override
   void initState() {
     //print('initState');
     super.initState();
+    _fetch();
+  }
+
+  Future<void> _fetch() async {
+    await Future.delayed(Duration(milliseconds: 1));
+
+    String? userID = await PreferenceHelper().getUserID();
+    String? userName = await PreferenceHelper().getUserName();
+
+    if(userID == null){
+      await PreferenceHelper().setUserID(_uuid.v4());
+    }
+
+    if (userName == null) {
+      final result = await _showUserSettingDialog();
+      if (result != true) return;
+    }
+
+    userID = await PreferenceHelper().getUserID();
+    userName = await PreferenceHelper().getUserName();
+    userInfo =
+        UserModel(userId: userID!, userName: userName!);
+
     _initSocket();
+  }
+
+  Future<bool> _showUserSettingDialog() async {
+    final TextEditingController controller = TextEditingController();
+
+    final result = await showDialog(
+        context: context,
+        builder: (context) => CardButtonDialog(
+              width: 400,
+              child: Column(
+                children: [
+                  Text(
+                    '프로필 설정',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: Row(
+                      children: [
+                        Expanded(flex: 1, child: Text('닉네임')),
+                        Expanded(
+                            flex: 6,
+                            child: RoundedTextFieldWidget(
+                              controller: controller,
+                              maxLength: 10,
+                            ))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+              onTapConfirm: () {
+                Navigator.pop(context, true);
+              },
+              confirmText: '저장',
+            ));
+
+    if (result != true) return false;
+
+    await PreferenceHelper().setUserName(controller.text);
+    return true;
   }
 
   Future<void> _initSocket() async {
@@ -40,14 +116,12 @@ class _ChatScreenState extends State<ChatScreen> {
       {"roomCode": roomCode, "userInfo": userInfo.toMap()}
     ]);
 
-
-
-    _socket.on('roomJoined',(data){
+    _socket.on('roomJoined', (data) {
       if (!this.mounted) return;
 
       final String socketId = data['socketId'];
       final UserModel user = UserModel.fromMap(data['userInfo']);
-      if(_socket.id == socketId){
+      if (_socket.id == socketId) {
         final MessageModel messageModel = MessageModel(
             uuid: _uuid.v4(),
             roomCode: roomCode,
@@ -202,24 +276,37 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Row(
       mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: message.userInfo.userId == userInfo.userId? MainAxisAlignment.end: MainAxisAlignment.start,
       children: [
-        Container(
-          constraints: BoxConstraints(
-            minWidth: 40,
-            maxWidth:
-                ResponsiveValue<double>(context, defaultValue: 700, valueWhen: [
-              Condition.smallerThan(name: TABLET, value: screenSize.width * 0.7)
-            ]).value!,
+        Column(
+            crossAxisAlignment:message.userInfo.userId == userInfo.userId?  CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+          if(message.userInfo.userId != userInfo.userId)Text(message.userInfo.userName,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w300),),
+          SizedBox(height: 5,),
+          Container(
+            constraints: BoxConstraints(
+              minWidth: 40,
+              maxWidth: ResponsiveValue<double>(context,
+                  defaultValue: 700,
+                  valueWhen: [
+                    Condition.smallerThan(
+                        name: TABLET, value: screenSize.width * 0.7)
+                  ]).value!,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  message.content,
+                  style: TextStyle(fontWeight: FontWeight.w300),
+                )
+              ],
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: message.userInfo.userId == userInfo.userId?colorScheme.primary.withOpacity(0.5):colorScheme.onSurface.withOpacity(0.1)),
           ),
-          child: Text(
-           message.content,
-            style: TextStyle(fontWeight: FontWeight.w300),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: colorScheme.onSurface.withOpacity(0.1)),
-        ),
+        ]),
       ],
     );
   }
