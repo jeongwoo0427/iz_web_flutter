@@ -21,11 +21,10 @@ class _ChatScreenState extends State<ChatScreen> {
     //print('initState');
     _socket.emit('joinRoom', [{
       "roomCode":"code1234",
-      "user":{
-        "id":"jwkim1234",
-        "name":"크크루삥뽕",
+      "userId":"jwkim1234",
+      "userName":"크크루삥뽕",
       }
-    }]);
+    ]);
     _socket.on('event', (data) => print(data));
     _socket.on('fromServer', (_) => print(_));
     _socket.on('error',(data) => print(data));
@@ -38,13 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    _socket.emit('quitRoom', [{
-      "roomCode":"code1234",
-      "user":{
-        "id":"jwkim1234",
-        "name":"크크루삥뽕",
-      }
-    }]);
+    _socket.emit('quitRoom');
     super.dispose();
   }
 
