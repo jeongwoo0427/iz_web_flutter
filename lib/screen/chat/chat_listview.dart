@@ -41,7 +41,15 @@ class ChatListView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            child: Text(message.content),
+            child: Text(
+              message.content,
+              style: TextStyle(
+                  fontSize: ResponsiveValue<double>(context,
+                      defaultValue: 18,
+                      valueWhen: [
+                    const Condition.smallerThan(name: TABLET, value: 16)
+                  ]).value),
+            ),
           )
         ],
       );

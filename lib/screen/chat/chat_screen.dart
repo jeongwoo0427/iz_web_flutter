@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iz_web_flutter/constant/app_constants.dart';
 import 'package:iz_web_flutter/core/cache/preference_helper.dart';
 import 'package:iz_web_flutter/core/mixin/dialog_mixin.dart';
@@ -7,9 +8,11 @@ import 'package:iz_web_flutter/core/mixin/future_mixin.dart';
 import 'package:iz_web_flutter/core/model/chat/message_model.dart';
 import 'package:iz_web_flutter/core/model/chat/user_model.dart';
 import 'package:iz_web_flutter/core/service/api/data/chat_message_data.dart';
+import 'package:iz_web_flutter/core/state/chat_room_users_state.dart';
 import 'package:iz_web_flutter/core/state/socket_state.dart';
 import 'package:iz_web_flutter/screen/chat/chat_input_field.dart';
 import 'package:iz_web_flutter/screen/chat/chat_listview.dart';
+import 'package:iz_web_flutter/screen/chat/chat_status_bar.dart';
 import 'package:iz_web_flutter/screen/chat/user_setting_dialog.dart';
 import 'package:iz_web_flutter/widget/dialog/card_button_dialog.dart';
 import 'package:iz_web_flutter/widget/input/rounded_textfield_widget.dart';
@@ -19,14 +22,14 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
+class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, FutureMixin {
   final IO.Socket _socket = SocketState().socket;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocus = FocusNode();
@@ -38,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
   late Future<bool> isMessageFutureFetched;
 
   UserModel userInfo =
-      UserModel(userId: 'unknown_user', userName: 'Unknown User');
+  UserModel(userId: 'unknown_user', userName: 'Unknown User');
 
   @override
   void initState() {
@@ -54,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
       await Future.delayed(Duration(milliseconds: 200));
 
       List<MessageModel> messages =
-          await ChatMessageData().getMessages(roomCode: roomCode);
+      await ChatMessageData().getMessages(roomCode: roomCode);
 
       _messages = messages;
 
@@ -90,7 +93,8 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
   Future<bool> _showUserSettingDialog({required String userId}) async {
     final result = await showDialog(
         context: context,
-        builder: (context) => UserSettingDialog(
+        builder: (context) =>
+            UserSettingDialog(
               userId: userId,
             ));
 
@@ -109,6 +113,7 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
 
       final String socketId = data['socketId'];
       final UserModel user = UserModel.fromMap(data['userInfo']);
+      //print(data);
       if (_socket.id == socketId) {
         final MessageModel messageModel = MessageModel(
             uuid: _uuid.v4(),
@@ -125,11 +130,21 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
       if (!this.mounted) return;
 
       MessageModel message = MessageModel.fromMap(data);
-      print(data);
+      //print(data);
       setState(() {
         _messages.insert(0, message);
       });
     });
+
+    _socket.on('updateRoomUsers', (data){
+       if (!this.mounted) return;
+       List<UserModel> users =[];
+       for(int i = 0; i<data.length; i++){
+         users.add(UserModel.fromMap(data[i]));
+       }
+       ref.read(chatRoomUsersState.notifier).fetchUsers(users: users);
+    });
+
     _socket.on('error', (data) => print(data));
     _socket.on('hey', (data) => print('hey ${data}'));
     _socket.onDisconnect((_) => print('disconnect'));
@@ -143,17 +158,27 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Size screenSize = MediaQuery
+        .of(context)
+        .size;
+    final ColorScheme colorScheme = Theme
+        .of(context)
+        .colorScheme;
+    final SizedBox responsiveSizedBox = SizedBox(
+      height: ResponsiveValue<double>(context,
+          defaultValue: 30,
+          valueWhen: [const Condition.smallerThan(name: TABLET, value: 20)])
+          .value,
+    );
     return WebResponsiveScaffold(
       navigationWidget: NavigationWidget(
         menuCode: MenuCodes.CHAT,
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 30,
-          ),
+          responsiveSizedBox,
+          ChatStatusBar(),
+          responsiveSizedBox,
           Container(
             width: double.infinity,
             height: (screenSize.height - 90) * 0.8,
@@ -168,19 +193,19 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
               children: [
                 Expanded(
                     child: FutureBuilder<bool>(
-                  future: isMessageFutureFetched,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      return buildLoader();
-                    }
-                    if (snapshot.hasError) {
-                      return buildError();
-                    } else if (snapshot.hasData) {
-                      return buildSuccess(_messages);
-                    }
-                    return buildNoData();
-                  },
-                )),
+                      future: isMessageFutureFetched,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return buildLoader();
+                        }
+                        if (snapshot.hasError) {
+                          return buildError();
+                        } else if (snapshot.hasData) {
+                          return buildSuccess(_messages);
+                        }
+                        return buildNoData();
+                      },
+                    )),
                 ChatInputField(
                     messageController: _messageController,
                     messageFocus: _messageFocus,
@@ -188,10 +213,9 @@ class _ChatScreenState extends State<ChatScreen> with DialogMixin, FutureMixin {
               ],
             ),
           ),
-
-          SizedBox(
-            height: 30,
-          ),
+          responsiveSizedBox,
+          responsiveSizedBox,
+          responsiveSizedBox,
         ],
       ),
     );

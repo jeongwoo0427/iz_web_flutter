@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iz_web_flutter/app_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'constant/app_themes.dart';
 import 'core/state/socket_state.dart';
@@ -9,7 +10,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final SocketState socket = SocketState();
   socket.connect();
-  runApp(const MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
