@@ -47,6 +47,7 @@ class ChatStatusBar extends ConsumerWidget {
                             onPressed: () {},
                             icon: Icon(
                               Icons.settings,
+                              color: colorScheme.onSurface,
                             ))
                       ],
                     )),
@@ -62,6 +63,7 @@ class ChatStatusBar extends ConsumerWidget {
                             },
                             icon: Icon(
                               Icons.people,
+                              color: colorScheme.onSurface,
                             ))
                       ],
                     )),
