@@ -57,7 +57,9 @@ class ChatStatusBar extends ConsumerWidget {
                       children: [
                         IconButton(
                             iconSize: 30 * responsiveRatio,
-                            onPressed: () {},
+                            onPressed: (){
+                              Scaffold.of(context).openEndDrawer();
+                            },
                             icon: Icon(
                               Icons.people,
                             ))
@@ -69,4 +71,5 @@ class ChatStatusBar extends ConsumerWidget {
           ],
         ));
   }
+
 }

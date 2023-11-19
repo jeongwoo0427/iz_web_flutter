@@ -15,6 +15,7 @@ import 'package:iz_web_flutter/screen/chat/chat_listview.dart';
 import 'package:iz_web_flutter/screen/chat/chat_status_bar.dart';
 import 'package:iz_web_flutter/screen/chat/user_setting_dialog.dart';
 import 'package:iz_web_flutter/widget/dialog/card_button_dialog.dart';
+import 'package:iz_web_flutter/widget/drawer/chat_room_users_drawer.dart';
 import 'package:iz_web_flutter/widget/input/rounded_textfield_widget.dart';
 import 'package:iz_web_flutter/widget/navigation_widget.dart';
 import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
@@ -137,6 +138,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
     });
 
     _socket.on('updateRoomUsers', (data){
+      print(data);
        if (!this.mounted) return;
        List<UserModel> users =[];
        for(int i = 0; i<data.length; i++){
@@ -174,6 +176,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
       navigationWidget: NavigationWidget(
         menuCode: MenuCodes.CHAT,
       ),
+      endDrawer: ChatRoomUsersDrawer(),
       body: Column(
         children: [
           responsiveSizedBox,
