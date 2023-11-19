@@ -30,7 +30,8 @@ class ChatScreen extends ConsumerStatefulWidget {
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, FutureMixin {
+class _ChatScreenState extends ConsumerState<ChatScreen>
+    with DialogMixin, FutureMixin {
   final IO.Socket _socket = SocketState().socket;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocus = FocusNode();
@@ -42,7 +43,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
   late Future<bool> isMessageFutureFetched;
 
   UserModel userInfo =
-  UserModel(userId: 'unknown_user', userName: 'Unknown User');
+      UserModel(userId: 'unknown_user', userName: 'Unknown User');
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
       await Future.delayed(Duration(milliseconds: 200));
 
       List<MessageModel> messages =
-      await ChatMessageData().getMessages(roomCode: roomCode);
+          await ChatMessageData().getMessages(roomCode: roomCode);
 
       _messages = messages;
 
@@ -94,8 +95,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
   Future<bool> _showUserSettingDialog({required String userId}) async {
     final result = await showDialog(
         context: context,
-        builder: (context) =>
-            UserSettingDialog(
+        builder: (context) => UserSettingDialog(
               userId: userId,
             ));
 
@@ -137,19 +137,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
       });
     });
 
-    _socket.on('updateRoomUsers', (data){
+    _socket.on('updateRoomUsers', (data) {
       print(data);
-       if (!this.mounted) return;
-       List<UserModel> users =[];
-       for(int i = 0; i<data.length; i++){
-         users.add(UserModel.fromMap(data[i]));
-       }
-       ref.read(chatRoomUsersState.notifier).fetchUsers(users: users);
+      if (!this.mounted) return;
+      List<UserModel> users = [];
+      for (int i = 0; i < data.length; i++) {
+        users.add(UserModel.fromMap(data[i]));
+      }
+      ref.read(chatRoomUsersState.notifier).fetchUsers(users: users);
     });
 
     _socket.on('error', (data) => print(data));
     _socket.on('hey', (data) => print('hey ${data}'));
-    _socket.onDisconnect((_) => print('disconnect'));
+    _socket.onDisconnect((_) async{
+      if (!this.mounted) return;
+      final result = await showAlertDialog(
+          context,
+          title: '연결오류',
+          content: '채팅방과의 연결이 유실되었습니다.',
+          positiveText: '닫기');
+
+      // if(result != true) return;
+      // setState(() {
+      //   isMessageFutureFetched = _fetchData();
+      // });
+    });
   }
 
   @override
@@ -160,16 +172,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery
-        .of(context)
-        .size;
-    final ColorScheme colorScheme = Theme
-        .of(context)
-        .colorScheme;
+    final Size screenSize = MediaQuery.of(context).size;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final SizedBox responsiveSizedBox = SizedBox(
       height: ResponsiveValue<double>(context,
-          defaultValue: 30,
-          valueWhen: [const Condition.smallerThan(name: TABLET, value: 20)])
+              defaultValue: 30,
+              valueWhen: [const Condition.smallerThan(name: TABLET, value: 20)])
           .value,
     );
     return WebResponsiveScaffold(
@@ -196,19 +204,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with DialogMixin, Futur
               children: [
                 Expanded(
                     child: FutureBuilder<bool>(
-                      future: isMessageFutureFetched,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState != ConnectionState.done) {
-                          return buildLoader();
-                        }
-                        if (snapshot.hasError) {
-                          return buildError();
-                        } else if (snapshot.hasData) {
-                          return buildSuccess(_messages);
-                        }
-                        return buildNoData();
-                      },
-                    )),
+                  future: isMessageFutureFetched,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return buildLoader();
+                    }
+                    if (snapshot.hasError) {
+                      return buildError();
+                    } else if (snapshot.hasData) {
+                      return buildSuccess(_messages);
+                    }
+                    return buildNoData();
+                  },
+                )),
                 ChatInputField(
                     messageController: _messageController,
                     messageFocus: _messageFocus,
