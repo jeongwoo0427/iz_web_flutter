@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iz_web_flutter/core/model/chat/user_model.dart';
 import 'package:iz_web_flutter/core/state/chat_room_users_state.dart';
+import 'package:iz_web_flutter/screen/chat/user_setting_dialog.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class ChatStatusBar extends ConsumerWidget {
@@ -44,7 +45,9 @@ class ChatStatusBar extends ConsumerWidget {
                       children: [
                         IconButton(
                             iconSize: 30 * responsiveRatio,
-                            onPressed: () {},
+                            onPressed: () async {
+                              showDialog(context: context, builder: (context)=> UserSettingDialog());
+                            },
                             icon: Icon(
                               Icons.settings,
                               color: colorScheme.onSurface,

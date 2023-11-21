@@ -1,31 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iz_web_flutter/core/state/socket_state.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/cache/preference_helper.dart';
+import '../../core/model/chat/user_model.dart';
+import '../../core/state/chat_room_user_state.dart';
 import '../../widget/dialog/card_button_dialog.dart';
 import '../../widget/input/rounded_textfield_widget.dart';
 
-class UserSettingDialog extends StatefulWidget {
-  final String userId;
-  final String? userName;
-  const UserSettingDialog({super.key, required this.userId, this.userName});
+class UserSettingDialog extends ConsumerStatefulWidget {
+  const UserSettingDialog({super.key});
 
   @override
-  State<UserSettingDialog> createState() => _UserSettingDialogState();
+  _UserSettingDialogState createState() => _UserSettingDialogState();
 }
 
-class _UserSettingDialogState extends State<UserSettingDialog> {
-
+class _UserSettingDialogState extends ConsumerState<UserSettingDialog> {
   late final TextEditingController _controller;
   final _uuid = Uuid();
   late String _userId;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _controller = TextEditingController(text: widget.userName);
-    _userId = widget.userId;
+    final UserModel? user = ref.read(chatRoomUserState);
+    _userId = user?.userId ?? _uuid.v4();
+    _controller = TextEditingController(text: user?.userName ?? '');
   }
 
   @override
@@ -59,7 +62,7 @@ class _UserSettingDialogState extends State<UserSettingDialog> {
                 IconButton(
                     onPressed: () async {
                       String userID = _uuid.v4();
-                      await PreferenceHelper().setUserID(userID);
+                      //await PreferenceHelper().setUserID(userID);
 
                       setState(() {
                         _userId = userID;
@@ -88,9 +91,12 @@ class _UserSettingDialogState extends State<UserSettingDialog> {
           ],
         ),
       ),
-      onTapConfirm: () async{
-
-        await PreferenceHelper().setUserName(_controller.text);
+      onTapConfirm: () async {
+        final UserModel user =  UserModel(userId: _userId, userName: _controller.text);
+        await ref.read(chatRoomUserState.notifier).updateUser(
+            user:user);
+        //await PreferenceHelper().setUserName(_controller.text);
+        SocketState().socket.emit('updateUserInfo',[user.toMap()]);
         Navigator.pop(context, true);
       },
       confirmText: '저장',

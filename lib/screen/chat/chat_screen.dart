@@ -8,6 +8,7 @@ import 'package:iz_web_flutter/core/mixin/future_mixin.dart';
 import 'package:iz_web_flutter/core/model/chat/message_model.dart';
 import 'package:iz_web_flutter/core/model/chat/user_model.dart';
 import 'package:iz_web_flutter/core/service/api/data/chat_message_data.dart';
+import 'package:iz_web_flutter/core/state/chat_room_user_state.dart';
 import 'package:iz_web_flutter/core/state/chat_room_users_state.dart';
 import 'package:iz_web_flutter/core/state/socket_state.dart';
 import 'package:iz_web_flutter/screen/chat/chat_input_field.dart';
@@ -42,8 +43,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   List<MessageModel> _messages = [];
   late Future<bool> isMessageFutureFetched;
 
-  UserModel userInfo =
-      UserModel(userId: 'unknown_user', userName: 'Unknown User');
+
 
   @override
   void initState() {
@@ -55,7 +55,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 
   Future<bool> _fetchData() async {
     try {
-      await _fetchUser();
+      await Future.delayed(Duration(milliseconds: 1));
+
+      await ref.read(chatRoomUserState.notifier).fetchUser();
+      final UserModel? user = ref.read(chatRoomUserState);
+
+      if (user == null) {
+        final result = await _showUserSettingDialog();
+        if (result != true) return false;
+      }
+
       await Future.delayed(Duration(milliseconds: 200));
 
       List<MessageModel> messages =
@@ -71,33 +80,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     }
   }
 
-  Future<void> _fetchUser() async {
-    await Future.delayed(Duration(milliseconds: 1));
 
-    String? userID = await PreferenceHelper().getUserID();
-    if (userID == null) {
-      userID = _uuid.v4();
-      await PreferenceHelper().setUserID(userID);
-    }
 
-    String? userName = await PreferenceHelper().getUserName();
-    if (userName == null) {
-      final result = await _showUserSettingDialog(userId: userID);
-      if (result != true) return;
-    }
-
-    userID = await PreferenceHelper().getUserID();
-    userName = await PreferenceHelper().getUserName();
-
-    userInfo = UserModel(userId: userID!, userName: userName!);
-  }
-
-  Future<bool> _showUserSettingDialog({required String userId}) async {
+  Future<bool> _showUserSettingDialog() async {
     final result = await showDialog(
         context: context,
-        builder: (context) => UserSettingDialog(
-              userId: userId,
-            ));
+        barrierDismissible: false,
+        builder: (context) => UserSettingDialog());
 
     if (result != true) return false;
 
@@ -105,8 +94,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   }
 
   Future<void> _initSocket() async {
+    final UserModel? user = ref.read(chatRoomUserState);
+    if(user == null) return;
+
     _socket.emit('joinRoom', [
-      {"roomCode": roomCode, "userInfo": userInfo.toMap()}
+      {"roomCode": roomCode, "userInfo": user.toMap()}
     ]);
 
     _socket.on('roomJoined', (data) {
@@ -121,8 +113,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             roomCode: roomCode,
             type: ChatMessageTypes.ALRT,
             content: '${user.userName}님이 등장하셨습니다.',
-            userId: userInfo.userId,
-            userName: userInfo.userName);
+            userId: user.userId,
+            userName: user.userName);
         _socket.emit('sendMessage', [messageModel.toMap()]);
       }
     });
@@ -138,7 +130,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     });
 
     _socket.on('updateRoomUsers', (data) {
-      print(data);
       if (!this.mounted) return;
       List<UserModel> users = [];
       for (int i = 0; i < data.length; i++) {
@@ -234,13 +225,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 
   @override
   Widget buildSuccess(data) {
+    final UserModel? user = ref.watch(chatRoomUserState);
     return ChatListView(
-      userInfo: userInfo,
+      userInfo: user!,
       messages: data,
     );
   }
 
   void _sendMessage() {
+    final UserModel? user = ref.read(chatRoomUserState);
+    if(user == null) return;
     if (_messageController.text.length == 0) return;
 
     final MessageModel messageModel = MessageModel(
@@ -248,8 +242,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         roomCode: roomCode,
         type: ChatMessageTypes.MSG,
         content: _messageController.text,
-        userId: userInfo.userId,
-        userName: userInfo.userName);
+        userId: user.userId,
+        userName: user.userName);
 
     _socket.emit('sendMessage', [messageModel.toMap()]);
     setState(() {
