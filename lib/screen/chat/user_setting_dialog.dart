@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iz_web_flutter/core/state/socket_state.dart';
+import 'package:iz_web_flutter/core/state/chat_socket_state.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/cache/preference_helper.dart';
@@ -96,7 +96,7 @@ class _UserSettingDialogState extends ConsumerState<UserSettingDialog> {
         await ref.read(chatRoomUserState.notifier).updateUser(
             user:user);
         //await PreferenceHelper().setUserName(_controller.text);
-        SocketState().socket.emit('updateUserInfo',[user.toMap()]);
+        ChatSocketState().socket.emit('updateUserInfo',[user.toMap()]);
         Navigator.pop(context, true);
       },
       confirmText: '저장',

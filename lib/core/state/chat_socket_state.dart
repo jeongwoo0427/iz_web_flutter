@@ -1,18 +1,18 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class SocketState {
+class ChatSocketState {
   late IO.Socket _socket;
 
   IO.Socket get socket => _socket;
 
-  static final SocketState _instance = SocketState._internal();
+  static final ChatSocketState _instance = ChatSocketState._internal();
 
-  factory SocketState() {
+  factory ChatSocketState() {
     return _instance;
   }
 
-  SocketState._internal() {
-    _socket = IO.io('http://182.172.171.168:34', IO.OptionBuilder().disableAutoConnect().build());
+  ChatSocketState._internal() {
+    _socket = IO.io('http://182.172.171.168:34', IO.OptionBuilder().disableAutoConnect().setPath('/chat').build());
 
     _socket.onConnect((_)=>print('Socket Connected!'));
 

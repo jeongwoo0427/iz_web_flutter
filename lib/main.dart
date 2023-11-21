@@ -4,11 +4,11 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'constant/app_themes.dart';
-import 'core/state/socket_state.dart';
+import 'core/state/chat_socket_state.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final SocketState socket = SocketState();
+  final ChatSocketState socket = ChatSocketState();
   socket.connect();
   runApp(ProviderScope(child: MyApp()));
 }
