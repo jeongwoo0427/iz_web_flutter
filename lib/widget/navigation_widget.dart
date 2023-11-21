@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iz_web_flutter/app_router.dart';
 import 'package:iz_web_flutter/constant/app_constants.dart';
+import 'package:iz_web_flutter/widget/scaffold/web_responsive_scaffold.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'scaffold/constrained_layout.dart';
@@ -64,77 +65,104 @@ class _NavigationWidgetState extends State<NavigationWidget> {
               // ResponsiveWrapper.of(context).isSmallerThan(TABLET)
               //     ? Text('넴플메이커')
               //     :
-              Row(
-                children: [
-                  GestureDetector(
-                    child: Text(
-                      '넴플메이커',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: widget.menuCode==MenuCodes.BANNERMAKER ? FontWeight.w900: FontWeight.w500,
-                          color: widget.showBackColor
-                              ? colorScheme.onBackground
-                              : Colors.white.withOpacity(0.9)),
-                    ),
-                    onTap: () {
-                      context.goNamed(RouteNames.RN_splatbannermaker_screen);
-                    },
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  GestureDetector(
-                    child: Text(
-                      '폭탄게임(개발중)',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: widget.menuCode==MenuCodes.GAME ? FontWeight.w900: FontWeight.w500,
-                          color: widget.showBackColor
-                              ? colorScheme.onBackground
-                              : Colors.white.withOpacity(0.9)),
-                    ),
-                    onTap: () {
-                      context.goNamed(RouteNames.RN_bomb_game_screen);
-                    },
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  GestureDetector(
-                    child: Text(
-                      '채팅방',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: widget.menuCode==MenuCodes.CHAT ? FontWeight.w900: FontWeight.w500,
-                          color: widget.showBackColor
-                              ? colorScheme.onBackground
-                              : Colors.white.withOpacity(0.9)),
-                    ),
-                    onTap: () {
-                      context.goNamed(RouteNames.RN_chat_screen);
-                    },
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  GestureDetector(
-                    child: Text(
-                      '테스트',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: widget.menuCode==MenuCodes.TEST ? FontWeight.w900: FontWeight.w500,
-                          color: widget.showBackColor
-                              ? colorScheme.onBackground
-                              : Colors.white.withOpacity(0.9)),
-                    ),
-                    onTap: () {
-                      context.goNamed(RouteNames.RN_test_screen);
-                    },
-                  ),
-                ],
-              )
+
+              ResponsiveValue<Widget>(context,
+                  defaultValue: _getSpreadMenus(),
+                  valueWhen: [
+                    Condition.smallerThan(
+                        name: TABLET, value: _getImplicationMenus())
+                  ]).value!
             ],
           ),
         ));
+  }
+
+  Widget _getImplicationMenus() {
+    return Material(
+        color: Colors.transparent,
+        child: IconButton(onPressed: () {
+
+        }, icon: Icon(Icons.menu)));
+  }
+
+  Widget _getSpreadMenus() {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        GestureDetector(
+          child: Text(
+            '넴플메이커',
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: widget.menuCode == MenuCodes.BANNERMAKER
+                    ? FontWeight.w900
+                    : FontWeight.w500,
+                color: widget.showBackColor
+                    ? colorScheme.onBackground
+                    : Colors.white.withOpacity(0.9)),
+          ),
+          onTap: () {
+            context.goNamed(RouteNames.RN_splatbannermaker_screen);
+          },
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        GestureDetector(
+          child: Text(
+            '폭탄게임(개발중)',
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: widget.menuCode == MenuCodes.GAME
+                    ? FontWeight.w900
+                    : FontWeight.w500,
+                color: widget.showBackColor
+                    ? colorScheme.onBackground
+                    : Colors.white.withOpacity(0.9)),
+          ),
+          onTap: () {
+            context.goNamed(RouteNames.RN_bomb_game_screen);
+          },
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        GestureDetector(
+          child: Text(
+            '채팅방',
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: widget.menuCode == MenuCodes.CHAT
+                    ? FontWeight.w900
+                    : FontWeight.w500,
+                color: widget.showBackColor
+                    ? colorScheme.onBackground
+                    : Colors.white.withOpacity(0.9)),
+          ),
+          onTap: () {
+            context.goNamed(RouteNames.RN_chat_screen);
+          },
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        GestureDetector(
+          child: Text(
+            '테스트',
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: widget.menuCode == MenuCodes.TEST
+                    ? FontWeight.w900
+                    : FontWeight.w500,
+                color: widget.showBackColor
+                    ? colorScheme.onBackground
+                    : Colors.white.withOpacity(0.9)),
+          ),
+          onTap: () {
+            context.goNamed(RouteNames.RN_test_screen);
+          },
+        ),
+      ],
+    );
   }
 }

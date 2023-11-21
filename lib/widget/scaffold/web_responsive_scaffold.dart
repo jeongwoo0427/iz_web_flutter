@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iz_web_flutter/widget/drawer/navigation_menu_drawer.dart';
 import 'package:iz_web_flutter/widget/navigation_widget.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
@@ -12,36 +13,48 @@ class WebResponsiveScaffold extends StatelessWidget {
   final Widget? body;
   final Widget? endDrawer;
 
-  const WebResponsiveScaffold({super.key,this.appBar, this.navigationWidget,this.body, this.endDrawer});
+  WebResponsiveScaffold(
+      {super.key,
+      this.appBar,
+      this.navigationWidget,
+      this.body,
+      this.endDrawer});
+
+
 
   @override
   Widget build(BuildContext context) {
+
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: appBar,
-      endDrawer: endDrawer,
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          if (navigationWidget != null) navigationWidget!,
-          Expanded(
-              child: DefaultTextStyle(
-            style: TextStyle(
-              color: colorScheme.onBackground,
-              fontWeight: FontWeight.w800,
-              fontFamily: AppFontFamily.cookie_run,
-              fontSize: ResponsiveValue<double>(context,
-                  defaultValue: 24,
-                  valueWhen: [
-                    const Condition.smallerThan(name: TABLET, value: 18)
-                  ]).value,
-            ),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: globalHorizonPadding15),
-              child: ConstrainedLayout(child: body ?? Container()),
-            ),
-          ))
-        ],
+      endDrawer: NavigationMenuDrawer(),
+      body: Scaffold(
+        endDrawer: endDrawer,
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            if (navigationWidget != null) navigationWidget!,
+            Expanded(
+                child: DefaultTextStyle(
+              style: TextStyle(
+                color: colorScheme.onBackground,
+                fontWeight: FontWeight.w800,
+                fontFamily: AppFontFamily.cookie_run,
+                fontSize: ResponsiveValue<double>(context,
+                    defaultValue: 24,
+                    valueWhen: [
+                      const Condition.smallerThan(name: TABLET, value: 18)
+                    ]).value,
+              ),
+              child: SingleChildScrollView(
+                padding:
+                    EdgeInsets.symmetric(horizontal: globalHorizonPadding15),
+                child: ConstrainedLayout(child: body ?? Container()),
+              ),
+            ))
+          ],
+        ),
       ),
     );
   }
