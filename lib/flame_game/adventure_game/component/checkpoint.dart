@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:iz_web_flutter/adventure_game/component/player.dart';
-
+import 'package:iz_web_flutter/flame_game/adventure_game/component/player.dart';
 import '../pixel_adventure.dart';
 
 class Checkpoint extends SpriteAnimationComponent

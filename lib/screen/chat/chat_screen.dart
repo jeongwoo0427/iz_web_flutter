@@ -10,7 +10,7 @@ import 'package:iz_web_flutter/core/model/chat/user_model.dart';
 import 'package:iz_web_flutter/core/service/api/data/chat_message_data.dart';
 import 'package:iz_web_flutter/core/state/chat_room_user_state.dart';
 import 'package:iz_web_flutter/core/state/chat_room_users_state.dart';
-import 'package:iz_web_flutter/core/state/chat_socket_state.dart';
+import 'package:iz_web_flutter/core/service/socket/chat_socket_service.dart';
 import 'package:iz_web_flutter/screen/chat/chat_input_field.dart';
 import 'package:iz_web_flutter/screen/chat/chat_listview.dart';
 import 'package:iz_web_flutter/screen/chat/chat_status_bar.dart';
@@ -33,7 +33,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen>
     with DialogMixin, FutureMixin {
-  final IO.Socket _socket = ChatSocketState().socket;
+  final IO.Socket _socket = ChatSocketService().socket;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocus = FocusNode();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();

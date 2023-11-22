@@ -12,25 +12,25 @@ class WebResponsiveScaffold extends StatelessWidget {
   final Widget? navigationWidget;
   final Widget? body;
   final Widget? endDrawer;
+  final Color? backgroundColor;
 
   WebResponsiveScaffold(
       {super.key,
       this.appBar,
       this.navigationWidget,
       this.body,
-      this.endDrawer});
-
-
+      this.endDrawer,
+      this.backgroundColor});
 
   @override
   Widget build(BuildContext context) {
-
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: appBar,
       endDrawer: NavigationMenuDrawer(),
       body: Scaffold(
         endDrawer: endDrawer,
+        backgroundColor: backgroundColor,
         body: Column(
           mainAxisSize: MainAxisSize.max,
           children: [

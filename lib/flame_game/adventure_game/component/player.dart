@@ -4,8 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
-import 'package:iz_web_flutter/adventure_game/component/saw.dart';
-import 'package:iz_web_flutter/adventure_game/component/utils.dart';
+import 'package:iz_web_flutter/flame_game/adventure_game/component/utils.dart';
 
 import '../pixel_adventure.dart';
 import 'checkpoint.dart';
@@ -13,6 +12,7 @@ import 'chicken.dart';
 import 'collision_block.dart';
 import 'custom_hitbox.dart';
 import 'fruit.dart';
+import 'saw.dart';
 
 enum PlayerState {
   idle,

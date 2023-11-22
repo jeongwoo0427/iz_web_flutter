@@ -66,12 +66,13 @@ class _NavigationWidgetState extends State<NavigationWidget> {
               //     ? Text('넴플메이커')
               //     :
 
-              ResponsiveValue<Widget>(context,
-                  defaultValue: _getSpreadMenus(),
-                  valueWhen: [
-                    Condition.smallerThan(
-                        name: TABLET, value: _getImplicationMenus())
-                  ]).value!
+              _getSpreadMenus()
+              // ResponsiveValue<Widget>(context,
+              //     defaultValue: _getSpreadMenus(),
+              //     valueWhen: [
+              //       Condition.smallerThan(
+              //           name: TABLET, value: _getImplicationMenus())
+              //     ]).value!
             ],
           ),
         ));
@@ -80,9 +81,7 @@ class _NavigationWidgetState extends State<NavigationWidget> {
   Widget _getImplicationMenus() {
     return Material(
         color: Colors.transparent,
-        child: IconButton(onPressed: () {
-
-        }, icon: Icon(Icons.menu)));
+        child: IconButton(onPressed: () {}, icon: Icon(Icons.menu)));
   }
 
   Widget _getSpreadMenus() {
@@ -110,25 +109,6 @@ class _NavigationWidgetState extends State<NavigationWidget> {
         ),
         GestureDetector(
           child: Text(
-            '폭탄게임(개발중)',
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: widget.menuCode == MenuCodes.GAME
-                    ? FontWeight.w900
-                    : FontWeight.w500,
-                color: widget.showBackColor
-                    ? colorScheme.onBackground
-                    : Colors.white.withOpacity(0.9)),
-          ),
-          onTap: () {
-            context.goNamed(RouteNames.RN_bomb_game_screen);
-          },
-        ),
-        SizedBox(
-          width: 20,
-        ),
-        GestureDetector(
-          child: Text(
             '채팅방',
             style: TextStyle(
                 fontSize: 14,
@@ -148,10 +128,10 @@ class _NavigationWidgetState extends State<NavigationWidget> {
         ),
         GestureDetector(
           child: Text(
-            '테스트',
+            '폭탄게임(개발중)',
             style: TextStyle(
                 fontSize: 14,
-                fontWeight: widget.menuCode == MenuCodes.TEST
+                fontWeight: widget.menuCode == MenuCodes.GAME
                     ? FontWeight.w900
                     : FontWeight.w500,
                 color: widget.showBackColor
@@ -159,9 +139,47 @@ class _NavigationWidgetState extends State<NavigationWidget> {
                     : Colors.white.withOpacity(0.9)),
           ),
           onTap: () {
-            context.goNamed(RouteNames.RN_test_screen);
+            context.goNamed(RouteNames.RN_bomb_game_screen);
           },
         ),
+        SizedBox(
+          width: 20,
+        ),
+        GestureDetector(
+          child: Text(
+            '멀티게임테스트',
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: widget.menuCode == MenuCodes.MULTIGAME
+                    ? FontWeight.w900
+                    : FontWeight.w500,
+                color: widget.showBackColor
+                    ? colorScheme.onBackground
+                    : Colors.white.withOpacity(0.9)),
+          ),
+          onTap: () {
+            context.goNamed(RouteNames.RN_multiplayer_game_screen);
+          },
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        // GestureDetector(
+        //   child: Text(
+        //     '테스트',
+        //     style: TextStyle(
+        //         fontSize: 14,
+        //         fontWeight: widget.menuCode == MenuCodes.TEST
+        //             ? FontWeight.w900
+        //             : FontWeight.w500,
+        //         color: widget.showBackColor
+        //             ? colorScheme.onBackground
+        //             : Colors.white.withOpacity(0.9)),
+        //   ),
+        //   onTap: () {
+        //     context.goNamed(RouteNames.RN_test_screen);
+        //   },
+        // ),
       ],
     );
   }

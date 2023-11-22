@@ -2,7 +2,8 @@ import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:iz_web_flutter/adventure_game/pixel_adventure.dart';
+
+import 'pixel_adventure.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

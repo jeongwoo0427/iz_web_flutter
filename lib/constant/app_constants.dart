@@ -10,6 +10,7 @@ class MenuCodes{
   static const String BANNERMAKER = 'SPLTBM';
   static const String GAME = 'GAME';
   static const String CHAT = 'CHAT';
+  static const String MULTIGAME = 'MTGM';
   static const String TEST = 'TEST';
 }
 

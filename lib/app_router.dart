@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iz_web_flutter/screen/chat/chat_screen.dart';
 import 'package:iz_web_flutter/screen/game/adventure_game_screen.dart';
+import 'package:iz_web_flutter/screen/multiplayer_game/multiplayer_game_screen.dart';
 import 'package:iz_web_flutter/screen/portfolio/portfolio_screen.dart';
 import 'package:iz_web_flutter/screen/test/test_screen.dart';
 
@@ -19,11 +20,14 @@ class RouteNames {
 
   static const String RN_bomb_game_screen = 'BombGameScreen';
 
-  static const String RN_test_screen = 'TestScreen';
-
   static const String RN_chat_screen = 'ChatScreen';
 
+  static const String RN_multiplayer_game_screen = 'MultiplayerGameScreen';
+
   static const String RN_portfolio_screen = 'PortfolioScreen';
+
+
+  static const String RN_test_screen = 'TestScreen';
 }
 
 class AppRouter {
@@ -35,8 +39,10 @@ class AppRouter {
     ]),
     GoRoute(name: RouteNames.RN_bomb_game_screen, path: '/bombgame', pageBuilder: defaultPageBuilder(BombGameScreen())),
     GoRoute(name: RouteNames.RN_chat_screen, path: '/chat', pageBuilder: defaultPageBuilder(ChatScreen())),
+    GoRoute(name: RouteNames.RN_multiplayer_game_screen, path: '/multigame', pageBuilder: defaultPageBuilder(MultiplayerGameScreen())),
+    GoRoute(name: RouteNames.RN_portfolio_screen, path: '/portfolio', pageBuilder: defaultPageBuilder(PortfolioScreen())),
+
     GoRoute(name: RouteNames.RN_test_screen, path: '/test', pageBuilder: defaultPageBuilder(TestScreen())),
-    GoRoute(name: RouteNames.RN_portfolio_screen, path: '/portfolio', pageBuilder: defaultPageBuilder(PortfolioScreen()))
   ]);
 }
 
