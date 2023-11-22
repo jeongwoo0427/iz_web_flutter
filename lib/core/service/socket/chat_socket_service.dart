@@ -12,11 +12,11 @@ class ChatSocketService {
   }
 
   ChatSocketService._internal() {
-    _socket = IO.io('http://182.172.171.168:34', IO.OptionBuilder().disableAutoConnect().setPath('/chat').build());
+    _socket = IO.io('http://182.172.171.168:34', IO.OptionBuilder().disableAutoConnect().build());
 
-    _socket.onConnect((_)=>print('Socket Connected!'));
+    _socket.onConnect((_)=>print('Chat Socket Connected!'));
 
-    print('SocketState is created');
+    print('Chat SocketState is created');
   }
 
   void connect(){

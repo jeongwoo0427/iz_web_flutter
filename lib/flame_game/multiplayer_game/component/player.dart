@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:iz_web_flutter/core/service/socket/game_socket_service.dart';
 
 class Player extends CircleComponent with KeyboardHandler{
 
@@ -9,6 +10,7 @@ class Player extends CircleComponent with KeyboardHandler{
   Player({required position})
       : super(position: position, radius: 23, anchor: Anchor.center);
 
+  final _socket = GameSocketService().socket;
 
   double moveSpeed = 300;
   double horizontalMovement = 0;
@@ -18,6 +20,9 @@ class Player extends CircleComponent with KeyboardHandler{
   @override
   void update(double dt) {
     _updatePlayerMovement(dt);
+    _socket.emit('updatePlayer',[{
+      'positionX': this.x, 'positionY': this.y
+    }]);
     super.update(dt);
   }
   void _updatePlayerMovement(double dt) {

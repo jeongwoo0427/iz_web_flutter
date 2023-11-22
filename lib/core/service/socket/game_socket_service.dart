@@ -12,11 +12,11 @@ class GameSocketService {
   }
 
   GameSocketService._internal() {
-    _socket = IO.io('http://182.172.171.168:34', IO.OptionBuilder().disableAutoConnect().setPath('/game').build());
+    _socket = IO.io('http://182.172.171.168:35', IO.OptionBuilder().disableAutoConnect().build());
 
     _socket.onConnect((_)=>print('Game Socket Connected!'));
 
-    print('SocketState is created');
+    print('Game SocketState is created');
   }
 
   void connect(){
