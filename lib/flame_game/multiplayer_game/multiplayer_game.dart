@@ -59,6 +59,7 @@ class MultiplayerGame extends FlameGame with HasKeyboardHandlerComponents {
     socket.on('roomQuit',(data){
       String socketId = data;
       remove(anotherPlayers[socketId]!);
+      anotherPlayers.remove(socketId);
     });
 
     return super.onLoad();
