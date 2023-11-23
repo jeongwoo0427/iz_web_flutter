@@ -52,7 +52,7 @@ class MultiplayerGame extends FlameGame with HasKeyboardHandlerComponents {
     socket.on('playerUpdated', (data) {
       String anotherId = data['socketId'];
       if(anotherId != socket.id){
-        anotherPlayers[anotherId]?.position = Vector2(data['positionX'], data['positionY']);
+        anotherPlayers[anotherId]?.updatePlayerPosition(Vector2(data['positionX'], data['positionY'])) ;
       }
     });
 
