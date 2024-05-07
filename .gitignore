@@ -45,3 +45,6 @@ app.*.map.json
 
 #Flutter Version Manager 
 /.fvm/
+
+# FVM Version Cache
+.fvm/
